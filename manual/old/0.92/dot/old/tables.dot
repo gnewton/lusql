@@ -1,0 +1,30 @@
+digraph lusql
+{
+	rankdir=LR;ratio=fill;
+
+	pub [shape=record, label="Publisher\nTable|<id>id|name"];
+	jou [shape=record,label="Journal\nTable|<id>id|<jpid>publisherId|title|issn"];
+	vol [shape=record,label="Volume\nTable|<id>id|<vjid>journalId|number|coverYear|coverMonth"];
+	iss [shape=record,label="Issue\nTable|<id>id|<ivid>volumeId|number"];
+	art [shape=record,label="Article\nTable|<id>id|<aiid>issueId|doi|title|abstract|startPage|endPage"];
+	aut [shape=record,label="Author\nTable|<id>id|firstName|lastName"];
+	aaj [shape=record,label="ArticleAuthorJoin\nTable|<artid>articleId|<autId>authorId"];
+	kw [shape=record,label="Keyword\nTable|<id>id|string"];
+	akj [shape=record,label="ArticleKeywordJoin\nTable|<aid>articleId|<kid>keywordId"];
+	cite [shape=record,label="Reference\nTable|<cid>id|<caid>referencingArticleId|<caaid>referencedArticleId"];
+
+	edge [arrowhead=dot]
+//	edge [arrowhead=dot,label="1:N"];
+	pub:id->jou:jpid;
+	jou:id->vol:vjid;
+	vol:id->iss:ivid;
+	iss:id->art:aiid;
+	art:id->aaj:artid;
+	art:id->akj:aid;
+//	edge [arrowhead=dot,label="N:1"];
+	aaj:autId->aut:id;
+	akj:kid->kw:id;
+        cite:caid->aut:id;
+        cite:caaid->aut:id;
+}
+

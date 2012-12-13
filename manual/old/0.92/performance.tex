@@ -1,0 +1,101 @@
+
+\subsection{Tuning}
+\subsubsection{Java VM options}
+\begin{mlist}
+\item {\tt -XX:+AggressiveOpts} was found to increase thoughput on this configuration.
+\end{mlist}
+
+\subsubsection{Lucene indexing}
+Using large RAM buffer makes indexing faster. 
+However, with very large RAM buffer size, the delay in flushing the buffer can
+be longer than the JDBC connection is comfortable with, and can cause a
+timeout. 
+This can be solved by setting rather small RAM buffer sizes, like the Lucene
+default value of 16MB.
+
+\subsubsection{SQL Database and queries}
+\begin{mlist}
+\item Make sure fields that are used in {\tt WHERE} clauses are appropriately indexed.
+\end{mlist}
+
+\paragraph{MySQL}
+\begin{mlist}
+
+\item Add {\tt cacheResultSetMetadata=true}\footnote{\url{http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-configuration-properties.html}} 
+  to the connection String for MySql. 
+\end{mlist}
+
+
+\subsection{Indexing Performance}
+Here is the indexing performance for examples 2--4 of the tutorial in
+Section \ref{tutorial}, indexing all of the records (6,409,484) from each
+query.  
+
+\subsubsection{Example 2}
+Total indexing time: {\bf 5675s (1h 34m 35s)} \\
+Optimizing time: {\bf 2725s (m s)} \\
+Index size: {\bf 21GB} \\
+
+\noindent LuSql command:
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Bash]
+java -XX:+AggressiveOpts -Xms1000m -Xmx1000m\
+ -jar lusql.jar  -q "select Article.id as id,\
+ Article.title as ti, Article.abstract as ab,\
+ Publisher.name as pub, Journal.title as jo,\
+ Journal.issn,Volume.number as vol,\
+ Volume.coverYear as year, Issue.number as iss,\
+ Article.doi as doi,Article.title as title,\
+ Article.abstract as abstract, Article.startPage as startPage,\
+ Article.endPage as endPage from Publisher, Journal,\
+ Volume, Issue, Article where Publisher.id=Journal.publisherId\
+ and Journal.id = Volume.journalId and Volume.id\
+ =Issue.volumeId and Issue.id = Article.issueId " -c\
+ "jdbc:mysql://dbhost/db?user=USER&password=PASS"\
+ -v -l example2-large
+\end{lstlisting}
+
+
+\subsubsection{Example 3}
+Total indexing time: {\bf 14750s (4h 4m 50s)} \\
+Optimizing time: {\bf 2260s (37m 40s)} \\
+Index size: {\bf 22GB} \\
+
+\noindent LuSql command:  \\
+Like Example 2, with  {\tt -l example3-large} and appending:
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Bash]
+-Q "id|select string as keyword from Keyword,\
+ ArticleKeywordJoin where ArticleKeywordJoin.articleId = @\
+ and ArticleKeywordJoin.keywordId = Keyword.id"\
+-Q "id|select lastName, firstName from Author,\
+ ArticleAuthorJoin where ArticleAuthorJoin.articleId = @\
+ and ArticleAuthorJoin.authorId = Author.id"\
+-Q "id|select referencedArticleId as citedId\
+ from Reference where Reference.referencingArticleId = @"
+\end{lstlisting}
+
+\subsubsection{Example 4}
+{\bf NB}: There was not sufficient disk space on the indexing machine to
+index. 
+Instead, the indexing was done on the database machine.
+As both the indexing and database were running in the same machine, it is
+almost certain that the indexing time would be significantly less than for the
+previous examples, so making comparisons between these results and results
+from Examples 2 and 3 would not be appropriate. \\
+
+\noindent Total indexing time: {\bf 49593 s (13h 46m 33s)} \\
+Optimizing time: {\bf 9623s (2h 40m 23s)} \\
+Index size: {\bf 86GB GB}
+
+\noindent LuSql command:  \\
+\noindent Like Example 3 with {\tt -l example4-large}, and appending
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Bash]
+ -f ca.nrc.cisti.lusql.example.FileFullTextFilter
+\end{lstlisting}
+
+
+
+
+
+
+
+

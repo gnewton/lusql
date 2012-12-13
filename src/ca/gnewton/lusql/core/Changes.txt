@@ -1,0 +1,26 @@
+- caching of subqueries: add "*" before the field name, like: 
+  -Q "*journalId|020|select title as category, id as categoryId from
+  JournalCategoryJoin, Category where JournalCategoryJoin.journalId = @ and
+  Category.id < 449 and JournalCategoryJoin.categoryId = Category.id"
+
+
+
+2008 01 18 15:10
+- noticed long closing for test 3 way join: on blue01.dartejos [select
+ Article.id, abstract, title, firstName, lastName from Article, Author,
+ ArticleAuthorJoin where Article.id = ArticleAuthorJoin.articleId and
+ ArticleAuthorJoin.authorId = Author.id]
+It turns out that MySQL sends all of the query, before allowing you to
+close. So if you only want 3000 of a 20m record quey, you have to wait
+thousands of seconds for it to complete as all of the unwanted records are
+sent down to you.
+* Solution: Take out explicit close for ResultSet, Statement and Connection. 
+  usually nt a good idea, but these are only opened and closed once, so no
+  problems.
+  Also, I checked MySQL using 'show processlist' and the connection (process)
+  goes away once the Java application shuts down (i.e. shorter time than
+  sending all records over...) -GNewton
+
+2008 01 16
+- Added stuff @ home
+  -GNewton

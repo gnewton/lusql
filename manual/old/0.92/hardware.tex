@@ -1,0 +1,39 @@
+\label{hardware}
+
+The configuration consisted of an indexing machine and a DBMS machine.
+LuSql was run from the indexing machine.
+For Example 4, the full-text files were stored on the storage array described
+below. 
+
+\subsection{Hardware}
+\noindent {\bf Indexing and database machines}: \\
+{\bf Dell PowerEdge 1955 Blade server}\footnote{\url{http://www.dell.com/content/products/productdetails.aspx/pedge_1955?c=us&l=en&s=corp}}\\
+\indent {\bf CPU}: 2 x dual-core Xeon 5050 processors with 2x2MB cache, 3.0 GHz\\
+\indent {\bf Memory}: 8 GB 667MHz\\
+\indent {\bf Disk:} 2 x 73GB internal 10K RPM SAS drives\\
+
+
+\noindent Both machines attached to:\\
+\indent Dell EMC AX150 storage arrays\\
+\indent 12 x 500 GB SATA II 7.2K RPM disks\\
+via:\\
+\indent SilkWorm
+200E\footnote{\url{http://www.brocade.com/products-solutions/products/switches/product-details/200e-switch/index.page}.
+Also see the Dell site
+\url{http://www.dell.com/content/products/productdetails.aspx/pvaul_ds16b4?c=us&cs=555&l=en&s=biz}}
+Series 16-Port Capable 4Gb Fabric Switch.
+
+\subsection{Software}
+{\bf MySql}: v5.0.45 compiled from source.
+
+\noindent {\bf gcc}: \\
+\ gcc version 4.1.2 20061115 (prerelease) (SUSE Linux)
+
+\noindent {\bf Java}: \\
+\ java version 1.6.0\_07\\
+\ Java(TM) SE Runtime Environment (build 1.6.0\_07-b06)\\
+\ Java HotSpot(TM) 64-Bit Server VM (build 10.0-b23, mixed mode)
+
+\subsection{Operating System}
+Linux openSUSE 10.2 (64-bit X86-64)\\
+Linux kernel: 2.6.18.8-0.10-default \#1 SMP

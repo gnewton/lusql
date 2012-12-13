@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="lusql" default="dist" basedir=".">
+	<description>
+        LuSQL - Lucene index from SQL query
+    </description>
+
+	<!-- global properties for this build -->
+	<property name="Name" value="LuSql"/>
+	<property name="version" value="0.92"/>
+	<property name="src" location="./src"/>
+	<property name="build" location="./build"/>
+	<property name="dist"  location="dist"/>
+	<property name="docs"  location="docs"/>
+	<property name="lusql" value="lusql-${version}.jar" />
+	<property name="lucene" value="lucene-core-2.4.1.jar" />
+	<property name="lucenelib" value="lib/${lucene}"/>
+	<property name="dbcp" value="commons-dbcp-1.2.2.jar"/>
+	<property name="dbcplib" value="lib/${dbcp}"/>
+	<property name="cli" value="commons-cli-1.1.jar"/>
+	<property name="clilib" value="lib/${cli}"/>
+	<property name="pool" value="commons-pool-1.4.jar"/>
+	<property name="poollib" value="lib/${pool}"/>
+	<property name="mysql" value="mysql-connector-java-5.0.7-bin.jar"/>
+	<property name="mysqlib" value="lib/${mysql}" />
+        <property name="bdb" value="je-3.3.75.jar"/>
+	<property name="bdblib" value="lib/${bdb}" />
+        <property name="solrj" value="apache-solr-solrj-1.3.0.jar"/>
+	<property name="solrjlib" value="lib/${solrj}" />
+
+        <property name="snow" value="lucene-snowball-2.4.1.jar"/>
+	<property name="snowlib" value="lib/${snow}" />
+
+        <property name="solrCommon" value="apache-solr-common-1.3.0.jar"/>
+	<property name="solrCommonlib" value="lib/${solrCommon}" />
+	<property name="debug" value="on"/>
+	<property name="optimize" value="on"/>
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp>
+			<format property="year" pattern="yyyy" locale="en" />
+		</tstamp>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac 
+           srcdir="${src}"
+           destdir="${build}"
+		   classpath="${lucenelib}:${dbcplib}:${poollib}:${clilib}:${mysqlib}:${bdblib}:${solrjlib}:${snowlib}:${solrCommonlib}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}">
+			<compilerarg value="-Xlint:all -nowarn"/>
+		</javac>
+	</target>
+
+
+	<target name="dist" depends="compile"
+        description="generate the distribution" 
+        >
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}/lib"/>
+       		<jar 
+                   jarfile="${dist}/lib/${lusql}/" 
+                   basedir="${build}"
+                 >
+                 <fileset dir="lib/unjar"/>
+
+  		 <manifest>
+		  <attribute name="Main-Class" value="ca.nrc.cisti.lusql.core.LuSqlMain" />
+                 <!--
+                  <attribute name="Class-Path" value="./ ${dbcp} ${lucene} ${cli} ${pool} ${mysql}" />
+                 -->
+		</manifest>
+		</jar>
+	</target>
+      <!--
+      <target name="zip" depends="dist" description="generates the zip">
+        <mkdir dir="${dist}/lib" />
+        <copy file="${lucenelib}" tofile="${dist}/lib/${lucenelibdist}" />
+        <copy file="${mysqlib}" tofile="${dist}/lib/${mysqlibdist}" />
+        <zip destfile="lusql-core.zip">
+           <fileset dir="${dist}" />
+        </zip>
+      </target>
+     -->
+
+	<target name="docs" depends="compile">
+		<mkdir dir="${docs}"/>
+		<javadoc 
+             sourcepath="${src}"
+    	     classpath="${lucenelib}"
+             destdir="${docs}"
+             author="true"
+             version="true"
+           	 use="true"
+	         breakiterator="yes"
+             splitindex="true"
+             noindex="false"
+             windowtitle="${Name} API Documentation"
+             doctitle="&lt;font face='Verdana,Arial,sans-serif'>${Name}: Database to Lucene Index Generator&lt;/font>"
+             bottom="Copyright &#169; ${year} National Research Council"             
+    />
+	</target>
+
+
+	<target name="clean"
+        description="clean up" >
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+		<delete dir="${docs}"/>
+	</target>
+</project>

@@ -1,0 +1,333 @@
+package ca.nrc.cisti.lusql.io.lucene;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import org.apache.lucene.index.*;
+import java.util.concurrent.locks.ReentrantLock;
+import org.apache.lucene.store.*;
+
+import ca.nrc.cisti.lusql.core.*;
+import ca.nrc.cisti.lusql.io.concurrent.*;
+
+/**
+ * Describe class ConcurrentLuceneDocSink here.
+ *
+ *
+ * Created: Mon Dec  1 17:38:28 2008
+ *
+ * @author <a href="mailto:gnewton@">Glen Newton</a>
+ * @version 1.0
+ */
+abstract public class ConcurrentLuceneDocSink
+    extends DocSink
+{
+    List<DocSink> docSinks = new ArrayList<DocSink>();
+
+
+    ThreadPoolExecutor tpe = null;
+    public boolean isThreaded()
+	{
+	    return true;
+	}
+
+    public ConcurrentDocSink()
+	{
+
+	}
+
+    public void init(Properties p) 
+	throws PluginException
+	{
+	    try
+	    {
+		extractProperties(p);
+		openDocSinks(p);
+		BlockingQueue<Runnable> docQueue = new ArrayBlockingQueue<Runnable>(docSinks.size() * 6);
+		//BlockingQueue<Runnable> docQueue = new ArrayBlockingQueue<Runnable>(32);
+		
+		tpe = new ThreadPoolExecutor(2,
+					     docSinks.size() * 3,
+					     16l,
+					     TimeUnit.SECONDS,
+					     docQueue,
+					     new ThreadPoolExecutor.CallerRunsPolicy());
+	    }
+	    catch(Throwable t)
+	    {
+		printDefaults();
+		t.printStackTrace();
+		throw new PluginException();
+	    }
+	}
+
+    void openDocSinks(Properties p)
+	throws PluginException
+	{
+	    for(int i=0; i<indexNames.size(); i++)
+	    {
+		System.out.println("Index: " + indexNames.get(i));
+		// FIX
+		DocSink newSink = new LuceneDocSink();
+
+		p.setProperty("index", indexNames.get(i));
+		p.setProperty("bufferSize", Double.toString(getRAMBufferSize() + nums[i%(nums.length)]));
+		if(i != 0)
+		    p.setProperty("optimizeOnClose", "false");
+		newSink.init(p);
+		if(i!= 0)
+		    newSink.setRemoveOnDone(true);
+		docSinks.add(newSink);
+
+	    }
+	}
+
+    public Map<String, String> explainProperties()
+	{
+	    Map<String, String> p = super.explainProperties();
+	    String className = this.getClass().getName() + ".";
+	    p.put(className+"secondaryIndexN", "Lucene index directories for parallel indexing. N=0....");
+	    return p;
+	}
+
+
+    void extractProperties(Properties p)
+	{
+	    super.extractProperties(p);
+	    indexNames.add(getLuceneIndexName());
+	    for(int i=0; i<256; i++)
+	    {
+		if(p.containsKey("secondaryIndex" + i))
+		    indexNames.add(p.getProperty("secondaryIndex" + i));
+		else
+		    break;
+	    }
+
+
+	}
+    Random random;
+    int t = 0;
+    private final ReentrantLock lock = new ReentrantLock();
+    public void addDoc(Doc doc)  
+	throws DocSinkException
+	{
+	    DocAdd da = new DocAdd();
+	    da.setDoc(doc);
+	    lock.lock();
+	    try
+	    {
+		if(t>=docSinks.size())
+		    t = 0;
+		da.setDocSink(docSinks.get(t));
+		++t;
+	    }
+	    finally
+	    {
+		lock.unlock();
+	    }
+	    tpe.execute(da);
+	    
+	}
+
+    public Object internal()
+	{
+	    throw new NullPointerException();
+	}
+
+    public void commit() throws DocSinkException
+	{
+	    try
+	    {
+		long tAll = System.currentTimeMillis();
+		for(int i=1; i<docSinks.size(); i++)
+		    {
+			long t0 = System.currentTimeMillis();
+			docSinks.get(i).commit();
+			System.out.println("Time to commit: " 
+					   + (System.currentTimeMillis()-t0)/1000);
+		    }
+		System.out.println("Time to commit all: " 
+				   + (System.currentTimeMillis()-tAll)/1000);
+	    }
+	    catch(Throwable t)
+	    {
+		t.printStackTrace();
+		throw new DocSinkException();
+	    }
+	}
+
+
+    public void commit2() throws DocSinkException
+	{
+	    try
+	    {
+		ConcurrentDocSinkDone[] dones = new ConcurrentDocSinkDone[docSinks.size()];
+		long tAll = System.currentTimeMillis();
+		for(int i=1; i<docSinks.size(); i++)
+		    {
+			dones[i] = new ConcurrentDocSinkDone(docSinks.get(i), ConcurrentDocSinkDone.CAction.Commit);
+			dones[i].start();
+		    }
+		for(int i=1; i<docSinks.size(); i++)
+		    dones[i].join();
+
+		System.out.println("Time to commit all: " 
+				   + (System.currentTimeMillis()-tAll)/1000);
+	    }
+	    catch(Throwable t)
+	    {
+		t.printStackTrace();
+		throw new DocSinkException();
+	    }
+	}
+
+    public void done()  
+	throws PluginException
+	{
+	    try
+	    {
+		System.out.println("Shutting down pool");
+		if(tpe != null)
+		{
+		    tpe.shutdown();
+		    tpe.awaitTermination(500l,
+					 TimeUnit.SECONDS);
+		}
+		commit();
+
+		Directory[] merges = new Directory[docSinks.size()-1];
+		
+		IndexWriter finalIndex = (IndexWriter)(docSinks.get(0).internal());
+		for(int i=1; i<docSinks.size(); i++)
+		    {
+			IndexWriter writer = ((IndexWriter)(docSinks.get(i).internal()));
+			merges[i-1] = writer.getDirectory();
+			docSinks.get(i).setRemoveOnDone(true);
+		    }
+
+		finalIndex.addIndexesNoOptimize(merges);
+
+		for(int i=1; i<docSinks.size(); i++)
+		    docSinks.get(i).done();
+
+		docSinks.get(0).done();
+
+		if(true)
+		    return;
+
+		
+
+
+	    Optimize[] opts = new Optimize[docSinks.size()];
+	    merges = new Directory[docSinks.size()-1];
+	    int count = 0;
+	    String finalIndexName = null;
+	    System.out.println("Merging indexes");
+	    for(int i=0; i<docSinks.size(); i++)
+	    {
+		Optimize opt = new Optimize((IndexWriter)(docSinks.get(i).internal()));
+		//docSinks.get(i).close();
+		if(indexNames.get(i) != getLuceneIndexName())
+		{
+		    opt.setOptimize(false);
+		}
+		else 
+		{
+		    opt.setClose(false);
+		    opt.setOptimize(false);
+		    writer = (IndexWriter)(docSinks.get(i).internal());
+		    //writer.optimize();
+		    finalIndexName = indexNames.get(i);
+		}
+		//opt.start();
+		opts[count++] = opt;
+		
+	    }
+	    
+	    count = 0;
+	    for(int i=0; i<opts.length; i++)
+	    {
+		System.out.println(i);
+		//opts[i].join();
+		if(opts[i].isClose())
+		    merges[count++] = FSDirectory.getDirectory(new File(indexNames.get(i)));
+	    }
+	    
+	    /*
+	      for(int i=0; i<closers.length; i++)
+	      {
+	      System.out.println(i);
+	      closers[i].join();
+	      if(closers[i].isClose())
+	      merges[i] = FSDirectory.getDirectory(new File(indexNames.get(i)));
+	      }
+	    */
+	    
+	    System.out.println("Merging docSinks");
+	    MergeScheduler  mergeScheduler = writer.getMergeScheduler();
+	    if(mergeScheduler instanceof ConcurrentMergeScheduler)
+	    {
+		System.out.println("thread=" + ((ConcurrentMergeScheduler)mergeScheduler).getMaxThreadCount() );
+		if(merges.length > ((ConcurrentMergeScheduler)mergeScheduler).getMaxThreadCount())
+		    ((ConcurrentMergeScheduler)mergeScheduler).setMaxThreadCount(merges.length);
+	    }
+	    //writer.addDocSinks(merges);
+	    writer.optimize();
+	    writer.close();
+	    
+	    for(int i=0; i<merges.length; i++)
+		merges[i].close();
+	    
+	    for(int i=0; i<docSinks.size(); i++)
+	    {
+		if(! indexNames.get(i).equals(finalIndexName))
+		    Util.removeDir(indexNames.get(i));
+	    }
+	    }
+	    catch(Throwable t)
+	    {
+		t.printStackTrace();
+		throw new PluginException();
+	    }
+	}
+
+
+
+    /**
+     * Describe <code>main</code> method here.
+     *
+     * @param args a <code>String</code> value
+     */
+    public static final void main(final String[] args) 
+	{
+	    Properties p = new Properties();
+	    p.put("bufferSize", "16");
+
+	    p.put("create", "true");
+	    p.put("optimizeOnClose", "true");
+	    p.put("index", "foo0");
+	    p.put("secondaryIndex0", "foo1");
+	    p.put("secondaryIndex1", "foo2");
+	    p.put("analyzer", "org.apache.lucene.analysis.standard.StandardAnalyzer");
+
+	    ConcurrentDocSink ci = new ConcurrentDocSink();
+	    try
+	    {
+		ci.init(p);
+		
+		LuceneFieldParameters lfp = new LuceneFieldParameters();
+		for(int i=0; i<1000000; i++)
+		{
+		    Doc d = new DocImp();
+		    d.addField("name", "n" + i, lfp);
+		    ci.addDoc(d);
+		}
+		ci.done();
+	    }
+	    catch(Throwable t)
+	    {
+		t.printStackTrace();
+	    }
+	}
+
+
+} ///////

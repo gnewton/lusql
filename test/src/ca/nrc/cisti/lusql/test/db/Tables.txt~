@@ -1,0 +1,20 @@
+PUBLISHER 
+create table PUBLISHER (id int(4), name varchar(255))
+JOURNAL
+create table JOURNAL (id int, title varchar, publisherId int, issn varchar(11))
+VOLUME
+create table VOLUME (id int, number varchar, coverYear int, coverMonth int, journalId int)
+ISSUE
+create table ISSUE (id int, number varchar(32), volumeId int)
+ARTICLE
+create table ARTICLE (id int, doi varchar(64), title text, abstract text, rawUrl varchar(256), startPage varchar(16), endPage varchar(16), issueId int)
+ARTICLEAUTHORJOIN
+create table ARTICLEAUTHORJOIN (articleId int, authorId int, authorPosition int)
+AUTHOR
+create table AUTHOR (id int, firstName varchar(64), lastName varchar(64))
+ARTICLEKEYWORDJOIN
+create table ARTICLEKEYWORDJOIN (articleId int, keywordId int)
+KEYWORD
+create table KEYWORD (id int, string varChar(64))
+REFERENCE
+create table REFERENCE (id int, number varchar(6), locationInFile int, rawString , rawXml text, referencingArticleId int, referencedArticleId int, databaseUpdateId int, updateTimeStamp timestamp)

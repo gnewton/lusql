@@ -1,0 +1,56 @@
+\label{parameters}
+These also apply to some other command line arguments, like {\tt -Q}.
+The default value is {\bfseries \tt 211} or {\tt Field.Index.TOKENIZED, Field.Store.YES, Field.TermVector.YES}.
+
+\subsection{\tt Field.Index}
+
+\begin{table}[h]
+\begin{center}
+\label{tableIndex}
+\begin{tabular}{|c|l|c|}
+\hline
+\bfseries Option value & {\bfseries \tt Field.Store} value&Default?\bfseries \\ \hline \hline
+        0&\tt NO & \\ \hline
+        1&\tt NO\_NORMS& \\\hline
+        2&\tt TOKENIZED& $\surd$\\\hline
+        3&\tt UN\_TOKENIZED& \\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+\subsection{\tt Field.Store}
+\begin{table}[h]
+\begin{center}
+\label{tableStore}
+\begin{tabular}{|c|l|c|}
+\hline
+\bfseries Option value & {\bfseries \tt Field.Store} value&Default?\bfseries \\ \hline \hline
+        0&\tt NO& \\ \hline
+        1&\tt YES&$\surd$ \\ \hline
+        2&\tt COMPRESS&\\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+
+
+
+\subsection{\tt Field.TermVector}
+\begin{table}[h]
+\begin{center}
+\label{tableVector}
+\begin{tabular}{|c|l|c|}
+\hline
+\bfseries Option value & {\bfseries \tt Field.TermVector} value&Default?\bfseries \\ \hline \hline
+        0& \tt NO&  \\\hline
+        1& \tt YES & $\surd$\\\hline
+        2& \tt WITH\_OFFSETS & \\\hline
+        3& \tt WITH\_POSITIONS & \\\hline
+        4& \tt WITH\_POSITIONS\_OFFSETS & \\\hline
+\end{tabular}
+\end{center}
+\end{table}

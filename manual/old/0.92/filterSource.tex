@@ -1,0 +1,126 @@
+\label{filterSource}
+This example can be found in: \\{\tt src/ca/nrc/cisti/lusql/example/FileFullTextFilter.java}.
+
+\begin{lstlisting}[language=Java]
+/**
+ * FileFullTextFilter gets the file supplied by field 'rawUrl' and adds
+ *  its text contents to the Doc object, to be indexed.
+ *
+ * Created: Wed Jan 16 03:47:09 2008
+ *
+ * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
+ * @copyright CISTI / National Research Council Canada
+ * @version 0.9
+ * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
+ * 
+ */
+package ca.nrc.cisti.lusql.example;
+import org.apache.lucene.document.*;
+import ca.nrc.cisti.lusql.core.*;
+import java.io.*;
+import java.util.zip.*;
+import java.util.*;
+
+public class FileFullTextFilter 
+    extends DBDocFilterImp
+{
+    // The base directory for all files
+    final static String BaseDir = "/mnt/data/dartimin/dartejos/";
+    final static String FullTextField = "fulltext";
+    final static int GZIPFACTOR=4;
+    public Doc filter(Doc doc)
+	{
+	    if(doc == null)
+		return null;
+
+	    //The text field (which is the 'rawUrl' field in the db) is the path fragment 
+            // for the fulltext file, which is compressed with gzip;
+	    List<String> fileFields = doc.getFieldValues("text");
+	    if(fileFields == null)
+	    {
+		System.err.println("FileFullTextFilter:: problem: no \"text\" field is in \
+                the main query");
+		getLuSql().setFatalError(true);
+		return doc;
+	    }
+	    String fileField = fileFields.get(0);
+	    if(fileField == null)
+	    {
+		System.err.println("FileFullTextFilter:: problem: no filename field in article id=" 
+                +  doc.getFieldValues("id").get(0));
+		getLuSql().setFatalError(true);
+		//return null;
+		return doc;
+	    }
+	    String text = readFileToString(BaseDir + fileField + ".gz", 65536);
+	    // move init
+	    LuceneFieldParameters textParas = new LuceneFieldParameters(Field.Index.TOKENIZED, 
+                                                  Field.Store.YES, Field.TermVector.YES);
+	    if(text != null && text.length() > 0)
+		doc.addField(FullTextField, text, textParas);
+	    return doc;
+	}
+    
+    String readFileToString(String filename, int bufSize)
+	{
+	    if(filename == null)
+		return null;
+	    StringBuilder sb = null;
+	    File f=null;
+	    BufferedReader reader = null;
+	    try
+	    {
+		f = new File(filename);
+		if(! (f.exists() && f.canRead()))
+		{
+		    System.err.println("Unable to read file: " + filename);
+		    return ""; // bad!
+		}
+		// Estimate the ungzipped size for good buffer size estimate
+		int estSize = (int)f.length();
+
+		if(filename.endsWith(".gz"))
+		{
+		    estSize = (int)(f.length() * GZIPFACTOR);
+		    reader = new BufferedReader(
+			new InputStreamReader(
+			    new GZIPInputStream(
+				new FileInputStream(f))), 
+			estSize);
+		}
+		else
+		{
+		    reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)), 
+                                                estSize);
+		}
+		if(bufSize <0)
+		    bufSize = estSize;
+		sb = new StringBuilder(estSize);
+		char[] cbuf = new char[bufSize];
+		int n = 0;
+		while((n = reader.read(cbuf, 0, bufSize))>0)
+		    sb.append(cbuf,0,n);
+	    }
+	    catch(Throwable t)
+	    {
+		t.printStackTrace();
+	    }
+	    finally
+	    {
+		try
+		{
+		    if(reader!=null)
+			reader.close();
+		}
+		catch(Throwable t)
+		{
+		    // OK
+		}
+	    }
+	    return sb.toString();
+	}
+
+}//////////
+
+\end{lstlisting}
+

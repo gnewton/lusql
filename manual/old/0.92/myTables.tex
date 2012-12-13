@@ -1,0 +1,137 @@
+
+{\small
+\subsection{{\tt Publisher} table}
+\begin{verbatim}
+mysql> describe Publisher;
++------------------+--------------+------+-----+-------------------+----------------+
+| Field            | Type         | Null | Key | Default           | Extra          |
++------------------+--------------+------+-----+-------------------+----------------+
+| id               | int(4)       | NO   | PRI | NULL              | auto_increment | 
+| name             | varchar(255) | YES  | UNI | NULL              |                | 
++------------------+--------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+
+\subsection{{\tt Journal} table}
+\begin{verbatim}
+mysql> describe Journal;
++------------------+--------------+------+-----+-------------------+----------------+
+| Field            | Type         | Null | Key | Default           | Extra          |
++------------------+--------------+------+-----+-------------------+----------------+
+| id               | int(6)       | NO   | PRI | NULL              | auto_increment | 
+| title            | varchar(255) | YES  |     | NULL              |                | 
+| publisherId      | int(4)       | YES  |     | NULL              |                |  
+| issn             | varchar(255) | YES  | UNI | NULL              |                |  
++------------------+--------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+\subsection{{\tt Volume} table}
+\begin{verbatim}
+mysql> describe Volume;
++------------------+--------------+------+-----+-------------------+----------------+
+| Field            | Type         | Null | Key | Default           | Extra          |
++------------------+--------------+------+-----+-------------------+----------------+
+| id               | int(8)       | NO   | PRI | NULL              | auto_increment | 
+| number           | varchar(255) | YES  | MUL | NULL              |                | 
+| coverYear        | int(4)       | YES  |     | NULL              |                | 
+| coverMonth       | int(2)       | YES  |     | NULL              |                | 
+| journalId        | int(6)       | YES  | MUL | NULL              |                | 
++------------------+--------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+\subsection{{\tt Issue} table}
+\begin{verbatim}
+mysql> describe Issue;
++------------------+--------------+------+-----+---------------------+----------------+
+| Field            | Type         | Null | Key | Default             | Extra          |
++------------------+--------------+------+-----+---------------------+----------------+
+| id               | int(10)      | NO   | PRI | NULL                | auto_increment | 
+| number           | varchar(255) | YES  |     | NULL                |                | 
+| volumeId         | int(8)       | YES  | MUL | NULL                |                | 
++------------------+--------------+------+-----+---------------------+----------------+
+\end{verbatim}
+
+\subsection{{\tt Article} table}
+\begin{verbatim}
+mysql> describe Article;
++------------------+--------------+------+-----+-------------------+----------------+
+| Field            | Type         | Null | Key | Default           | Extra          |
++------------------+--------------+------+-----+-------------------+----------------+
+| id               | int(10)      | NO   | PRI | NULL              | auto_increment | 
+| doi              | varchar(255) | YES  |     | NULL              |                | 
+| title            | text         | YES  |     | NULL              |                | 
+| abstract         | text         | YES  |     | NULL              |                | 
+| rawUrl           | varchar(255) | YES  |     | NULL              |                | 
+| startPage        | varchar(255) | YES  | MUL | NULL              |                | 
+| endPage          | varchar(255) | YES  |     | NULL              |                | 
+| issueId          | int(10)      | YES  | MUL | NULL              |                | 
++------------------+--------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+\subsection{{\tt ArticleAuthorJoin} table}
+\begin{verbatim}
+mysql> describe ArticleAuthorJoin;
++------------------+-----------+------+-----+-------------------+-------+
+| Field            | Type      | Null | Key | Default           | Extra |
++------------------+-----------+------+-----+-------------------+-------+
+| articleId        | int(10)   | YES  | MUL | NULL              |       | 
+| authorId         | int(10)   | YES  | MUL | NULL              |       | 
+| authorPosition   | int(2)    | YES  |     | NULL              |       | 
++------------------+-----------+------+-----+-------------------+-------+
+\end{verbatim}
+
+\subsection{{\tt Author} table}
+\begin{verbatim}
+mysql> describe Author;
++------------------+--------------+------+-----+-------------------+----------------+
+| Field            | Type         | Null | Key | Default           | Extra          |
++------------------+--------------+------+-----+-------------------+----------------+
+| id               | int(10)      | NO   | PRI | NULL              | auto_increment | 
+| firstName        | varchar(150) | YES  |     | NULL              |                | 
+| lastName         | varchar(150) | YES  | MUL | NULL              |                | 
++------------------+--------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+\subsection{{\tt ArticleKeywordJoin} table}
+\begin{verbatim}
+mysql> describe ArticleKeywordJoin;
++------------------+-----------+------+-----+-------------------+-------+
+| Field            | Type      | Null | Key | Default           | Extra |
++------------------+-----------+------+-----+-------------------+-------+
+| articleId        | int(10)   | YES  | MUL | NULL              |       | 
+| keywordId        | int(8)    | YES  | MUL | NULL              |       | 
++------------------+-----------+------+-----+-------------------+-------+
+\end{verbatim}
+
+\subsection{{\tt Keyword} table}
+\begin{verbatim}
+mysql> describe Keyword;
+describe Keyword;
++------------------+------------+------+-----+-------------------+----------------+
+| Field            | Type       | Null | Key | Default           | Extra          |
++------------------+------------+------+-----+-------------------+----------------+
+| id               | int(8)     | NO   | PRI | NULL              | auto_increment | 
+| string           | tinytext   | NO   | MUL |                   |                | 
++------------------+------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+\subsection{{\tt Reference} table}
+\begin{verbatim}
+mysql> describe Reference;
++----------------------+--------------+------+-----+-------------------+----------------+
+| Field                | Type         | Null | Key | Default           | Extra          |
++----------------------+--------------+------+-----+-------------------+----------------+
+| id                   | int(10)      | NO   | PRI | NULL              | auto_increment | 
+| number               | varchar(255) | YES  |     | NULL              |                | 
+| locationInFile       | int(5)       | YES  |     | NULL              |                | 
+| rawString            | text         | YES  |     | NULL              |                | 
+| rawXml               | text         | YES  |     | NULL              |                | 
+| referencingArticleId | int(10)      | YES  | MUL | NULL              |                | 
+| referencedArticleId  | int(10)      | YES  | MUL | NULL              |                | 
+| databaseUpdateId     | int(4)       | YES  |     | NULL              |                | 
+| updateTimeStamp      | timestamp    | NO   |     | CURRENT_TIMESTAMP |                | 
++----------------------+--------------+------+-----+-------------------+----------------+
+\end{verbatim}
+
+}
+

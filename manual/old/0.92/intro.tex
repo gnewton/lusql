@@ -1,0 +1,169 @@
+
+LuSql\footnote{LuSql: {\em loo'-skwill}} is an easy to use, high-performance
+command-line Java application originally designed to allow users to create
+Lucene indexes from the results of a SQL query of a SQL database, but now
+extended to be a ZZZZ, allowing data migration from a number of source and
+destination platforms using a plug-in architecture.
+
+While LuSql does support JDBC --> Lucene migration directly, it also comes
+with a number of drivers for other systems.
+These include:
+sources:
+JDBC, BDB, Java serialized objects
+sinks:
+JDBC, BDB, XML, text, Lucene, Minion, Solr (via SolrJ), Serialized
+
+
+
+\subsection{Why LuSql?}
+Many users have their data in a DBMS and some have the need to move
+this data to Lucene.
+For some, they find that their needs for full-text indexing are not well-met
+by their DBMS. 
+For others, they need a web facing searchable cache of data stored in their
+DBMS.  
+
+Whatever the specific use case, moving this data to Lucene is an effective and
+fairly common solution.  
+But how to do this?
+On the Lucene user mailing
+list\footnote{\url{http://mail-archives.apache.org/mod_mbox/lucene-java-user}},
+periodically someone asks if there are simple tools for doing this sort of
+data transfer:
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+ To: java-user@lucene.apache.org
+ From: "???" <xx.xx.@xxxx.com>
+ Subject: Lucene Indexing DB records?
+ Date: Fri, 22 Aug 2008 09:26:54 GMT
+  
+ Guess I don't quite understand why there are so few posts 
+ about Lucene indexing DB records. Searched Markmail, but 
+ most of the Lucene+DB posts have to do with lucene index 
+ management. 
+  
+ The only thing I found so far is the following, if you 
+ have a minute or two:
+ http://kalanir.blogspot.com/2008/06/indexing-database-
+using-apache-lucene.html
+  
+ Any comment on this? Efficiency? No need to maintain any 
+ intermediate data?
+  
+ Thanks much,
+ -Xxx
+\end{lstlisting}
+
+
+There {\em are} a number of tools which support this sort kind of data transfer
+from a DBMS to Lucene, either directly or as part of a larger framework: 
+\begin{mlist}
+\item SOLR\footnote{\url{http://lucene.apache.org/solr/}}
+\item DBSight\footnote{
+        \url{http://www.dbsight.net/}
+        }
+\item Lucene4DB.Net\footnote{
+        \url{http://www.netomatix.com/Products/DocumentManagement/Lucene4DB.aspx}
+        }
+\item Hibernate Search\footnote{
+        \url{http://search.hibernate.org/}
+        }
+\item Compass\footnote{\url{http://www.compass-project.org/}}
+\end{mlist}
+
+
+
+Without getting into an in-depth analysis of each of these tools, they all suffer
+from one or more of the following issues:
+\begin{mlist}
+\item Overly complicated for non-Lucene / non-Java / non-XML /
+  non-framework users
+\item Poor performance
+\item Not Open Source Software (OSS)
+\end{mlist}
+
+
+LuSql is a simple, high performance, OSS DBMS to Lucene indexing
+application that has a very low barrier for use.
+Users need the following to use LuSql:
+\begin{mlist}
+\item Knowledge of SQL
+\item Knowledge of their database and tables
+\item Ability to set the Java CLASSPATH in a command-line shell
+\item Ability to run a command line application
+\end{mlist}
+
+At the same time, LuSql offers rich features that make it useful for
+some very complex use cases.
+
+
+
+
+\subsection{Features}
+LuSql offers control over which
+{\tt
+    Analyzer}\footnote{\url{http://lucene.apache.org/java/2_3_2/api/org/apache/lucene/analysis/Analyzer.html} 
+  }
+is applied to the 
+{\tt Field}s\footnote{Right now only a single Analyzer is applied to all
+  fields. See Section \ref{todo} for more information.} and how/if a
+{\tt Field} is stored, indexed, tokenized, compressed, term vectored, etc.
+
+\noindent The SQL query can range from a simple query on a single table: 
+
+
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+  select * from Person;
+\end{lstlisting}
+
+\noindent 
+to a complex query involving multiple
+tables and joins:
+%\begin{verbatim}
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+select Article.id, Article.title, Article.abstract,
+ Publisher.name as pub, Journal.title as jo, Journal.issn,
+ Volume.number as vol, Volume.coverYear as year, 
+ Issue.number as iss from Publisher, Journal, Volume, 
+ Issue, Article where Publisher.id =Journal.publisherId and 
+ Journal.id = Volume.journalId and Volume.id = Issue.volumeId 
+ and Issue.id = Article.issueId;
+\end{lstlisting}
+%\end{verbatim}
+
+\noindent For extracting additional DBMS information that is difficult or not possible
+through a single SQL query, LuSql supports arbitrary per document subqueries.
+These subqueries use a field from the original query as a key into other
+fields. 
+
+LuSql also offers a plugin architecture for out-of-band
+operations on each document {\em after} it is created from the SQL
+record but {\em before} it is inserted into the Lucene index. 
+An example use case could be where a field in the SQL record is the full path
+to a file in the filesystem that contains full-text that the user wants
+indexed in a {\tt Field} in addition to the SQL fields already in the document.
+ Using the plugin architecture, a Java class can be written and used by LuSql
+ to read the file defined by this field and index the contents.
+
+
+
+LuSql also offers control over the following:
+\begin{mlist}
+\item The manner in which specific {\tt Field}s are stored, i.e. index, store,
+  and term vector parameters. 
+\item Number of documents to add to index from query {\tt ResultSet}
+\item Append to or create new Lucene index
+\item Stop word list file
+\item JDBC URL
+\item JDBC driver class\footnote{The default JDBC driver is the MySQL
+    driver, {\tt com.mysql.jdbc.Driver}}
+\item JDBC {\tt ResultSet} fetch size
+\item Lucene RAM buffer size 
+\item Number of worker threads; worker queue size
+\end{mlist}
+
+\subsubsection{What LuSql is not}
+Some of the tools mentioned above offer various features, like automatically
+building a web search interface for the created Lucene index.
+LuSql only builds a Lucene index.
+It is up to the user to decide how they are going to create a user interface
+to search the created Lucene index. 

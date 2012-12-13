@@ -1,0 +1,56 @@
+
+\subsection{Download}
+The LuSql website
+lists\footnote{\url{http://lab.cisti-icist.nrc-cnrc.gc.ca/cistilabswiki/index.php/LuSql}}
+  where LuSql bin and src jar files can be downloaded.
+
+
+
+\subsection{Dependencies}
+LuSql has the following dependencies:
+\begin{mlist}
+ \item Apache Commons dbcp\footnote{\url{http://commons.apache.org/dbcp/}}. 
+   Tested: {\tt commons-dbcp-1.2.2.jar}. 
+%   \href{http://cuvier.cisti.nrc.ca/~gnewton/lusql/v0.9/lib/commons-dbcp-1.2.2.jar}{Local copy}
+
+\item Apache Commons cli\footnote{\url{http://commons.apache.org/cli/}}.
+   Tested: {\tt commons-cli-1.1.jar}.
+%\href{http://cuvier.cisti.nrc.ca/~gnewton/lusql/v0.9/lib/commons-cli-1.1.jar}{Local copy}.
+
+ \item Apache Commons pool\footnote{\url{http://commons.apache.org/pool/}}.
+   Tested: {\tt commons-pool-1.4.jar}.
+%\href{http://cuvier.cisti.nrc.ca/~gnewton/lusql/v0.9/lib/commons-pool-1.4.jar}{Local copy}.
+  
+ \item Lucene core\footnote{\url{http://lucene.apache.org/java/docs/releases.html}}.
+   Tested: {\tt lucene-core-2.3.1.jar}.
+%\href{http://cuvier.cisti.nrc.ca/~gnewton/lusql/v0.9/lib/lucene-core-2.3.1.jar}{Local copy}.
+
+ \item MySQL
+     Connector/J JDBC driver\footnote{\url{http://dev.mysql.com/downloads/connector/j/5.1.html}}.
+     Tested: {\tt mysql-connector-java-5.0.7-bin.jar}.
+%     \href{http://cuvier.cisti.nrc.ca/~gnewton/lusql/v0.9/lib/mysql-connector-java-5.0.7-bin.jar}{Local copy}.
+\end{mlist}
+\noindent The LuSql jar file contains all of these dependency jar files.
+
+\subsection{Running}
+If the versions of these software as included in the LuSql jar file are
+appropriate for your use, and the database you wish to connect to is MySQL,
+then you can invoke LuSql using the Java {\tt -jar} syntax:
+{\small
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+  java -jar lusql-0.9.jar [command line parameters]
+\end{lstlisting}
+}
+
+However, if you wish to use a different database driver, a newer version of
+Lucene ($>$ 2.3.1) or newer versions of the Apache commons class libraries, you
+need to add all of the dependency jars to your {\tt CLASSPATH} and invoke
+LuSql in the following manner: 
+{\small
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+  java ca.nrc.cisti.lusql.core.LuSqlMain [command line parameters]
+\end{lstlisting}
+}
+
+This way of invoking LuSql will NOT use the LuSql dependencies included in the
+LuSql jar file, but will instead use the ones in your {\tt CLASSPATH}.

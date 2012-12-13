@@ -1,0 +1,48 @@
+
+{\small
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+> time java -XX:+AggressiveOpts -Xms1000m -Xmx3000m ca.nrc.cisti.lusql.core.LuSqlMain...
+Using sql:[select Article.id as id, Article.rawUrl as text, Publisher.name as...
+Using Analyzer:[org.apache.lucene.analysis.standard.StandardAnalyzer]
+Using Stop Word FileName:[null]
+Using Properties FileName:[null]
+Using DB driver name:[com.mysql.jdbc.Driver]
+Using DB URL:[jdbc:mysql://dbhost/db?user=USER&password=PASS&autoReconnect=true]
+Using Lucene index:tutorial-3
+Using Lucene index RAMBUFFER MBs:256.0
+Using multithreaded:true
+Using Test:false
+Using Field parameters:211
+Using setting DB fetchsize=0 (see -m)
+Using Num documents to add:50000
+Using Lucene index directory:tutorial-3
+Using -Q SQL replacement character:@
+Using -Q SQL:select string as keyword from Keyword, ArticleKeywordJoin where ...
+Using -Q SQL:select lastName, firstName from Author,  ArticleAuthorJoin where ...
+Using -Q SQL:select referencedArticleId as citedId  from Reference where ...
+Opening Lucene index: tutorial-3
+Opening MySQL connection
+Querying:select Article.id as id, Article.rawUrl as text, Publisher.name as ...
+Indexing
+Threading: Queue size=100
+bThreading: # threads=20
+.......... 10000 docs    16s
+.......... 20000 docs    17s
+.......... 30000 docs    20s
+.......... 40000 docs    19s
+.......... 50000 docs    19s
+
+Number of records added= 50000
+Optimizing index
+  Closing index
+  Optimizing index time: 7 seconds
+Closing JDBC: result set
+Closing JDBC: statement
+Closing JDBC: connection
+*********** Elapsed time: 98 seconds
+
+
+real	1m47.250s
+user	1m47.495s
+sys	0m45.111s
+\end{lstlisting}

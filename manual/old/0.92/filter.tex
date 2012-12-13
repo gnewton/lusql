@@ -1,0 +1,83 @@
+\label{filter}
+LuSql offers a plugin architecture which allows the user to define a
+class which has access to the {\tt Doc} after it is created but
+before it is converted into a Lucene {\tt Document} and this is indexed. 
+This allows arbitrary modification of the {\tt Doc} object.
+
+
+\subsection{Interface {\tt DocFilter}}
+A class implementing {\tt DocFilter} only needs to implement the
+two methods shown below.
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Java]
+public interface DocFilter 
+{
+    public Doc filter(Doc doc); 
+    public void onDone();
+    public void setProperties(Properties filterProperties);
+}
+\end{lstlisting}
+
+\subsubsection{Class {\tt Doc}}
+\label{doc}
+{\tt Doc} is an interface that is LuSql's internal abstract
+representation of a document, that exposes a number of methods to allow manipulation:
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Java]
+public interface Doc 
+{
+   public void addField(final String name, String value, LuceneFieldParameters lfp);
+   public LuceneFieldParameters getFieldParameters(String field);
+   public void addFieldParameters(String[] fieldNames, LuceneFieldParameters[] paras);
+   public void addField(final String name, String value);
+   public void addFieldParameter(String field, LuceneFieldParameters paras);
+   public void populate(ResultSet rs, String[] fieldNames) throws SQLException;
+   public boolean containsField(String key);
+   public void removeField(String name);
+   public Iterator<String> getFieldNames();
+   public List<String> getFieldValues(String key);
+   public void clear();
+}
+\end{lstlisting}
+
+\subsubsection{Class {\tt LuceneFieldParameters}}
+The LuSql class {\tt LuceneFieldParameters} used above is a container class for the
+three Lucene {\tt Field} parameters and has the following constructor:
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Java]
+    public LuceneFieldParameters(Field.Index newIndex,
+				 Field.Store newStore,
+				 Field.TermVector newTermVector) 
+\end{lstlisting}
+
+
+
+
+\subsection{Interface {\tt DBDocFilter}}
+Sometimes the class implementing {\tt DocFilter} needs to access
+the SQL database being used.
+{\tt DBDocFilter} is an interface that extends  {\tt
+  DocFilter} and offers access to the {\tt DataSource} object so
+it can be used by the filter.
+The {\tt DBDocFilterImp} class implements this interface, so
+developers can just extend this class to get this functionality.
+
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Java]
+public interface DBDocFilter 
+    extends DocFilter 
+{
+    public void setDataSource(DataSource ds);
+    public DataSource getDataSource();
+}
+\end{lstlisting}
+
+See Appendix \ref{filterSource} for an example implementation.
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,46 @@
+
+{\small
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+> time java -XX:+AggressiveOpts -Xms1000m -Xmx3000m -jar lusql.jar  ...
+Using sql:[select Article.id as id, Article.rawUrl as text, Publisher.name... 
+Using Analyzer:[org.apache.lucene.analysis.standard.StandardAnalyzer]
+Using Stop Word FileName:[null]
+Using Properties FileName:[null]
+Using DB driver name:[com.mysql.jdbc.Driver]
+Using DB URL:[jdbc:mysql://dbhost/db?user=USER&password=PASS&autoReconnect=true]
+Using Lucene index:tutorial-2
+Using Lucene index RAMBUFFER MBs:256.0
+Using multithreaded:true
+Using Test:false
+Using Field parameters:211
+Using setting DB fetchsize=0 (see -m)
+Using Num documents to add:50000
+Using Lucene index directory:tutorial-2
+Using -Q SQL replacement character:@
+Opening Lucene index: tutorial-2
+Opening MySQL connection
+Querying:select Article.id as id, Article.rawUrl as text, Publisher.name as...
+Indexing
+Threading: Queue size=100
+Threading: # threads=20
+.......... 10000 docs    3s
+.......... 20000 docs    2s
+.......... 30000 docs    2s
+.......... 40000 docs    2s
+.......... 50000 docs    2s
+
+Number of records added= 50000
+Optimizing index
+  Closing index
+  Optimizing index time: 5 seconds
+Closing JDBC: result set
+Closing JDBC: statement
+Closing JDBC: connection
+*********** Elapsed time: 17 seconds
+
+real	0m16.514s
+user	0m36.430s
+sys	0m2.332s
+>
+\end{lstlisting}
+}

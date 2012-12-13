@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="lusql" default="dist" basedir=".">
+	<description>
+       LuSql tests
+    </description>
+
+	<!-- global properties for this build -->
+	<property name="Name" value="LuSqlTests"/>
+	<property name="version" value="1.00"/>
+	<property name="src" location="./src"/>
+	<property name="build" location="./build"/>
+	<property name="dist"  location="dist"/>
+	<property name="docs"  location="docs"/>
+
+        <!-- Start LuSql Libs -->
+	<property name="lusqlLib" value="../dist/lib/lusql.jar" />
+        <!-- End LuSql Libs -->
+
+
+        <!-- Start test Libs -->
+	<property name="derbylib" value="lib/derby" />
+        <!-- End test Libs -->
+
+
+	<property name="debug" value="on"/>
+	<property name="optimize" value="on"/>
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp>
+			<format property="year" pattern="yyyy" locale="en" />
+		</tstamp>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac 
+           srcdir="${src}"
+           destdir="${build}"
+		   classpath="${lucenelib}:${dbcplib}:${poollib}:${clilib}:${mysqlib}:${bdblib}:${solrjlib}:${snowlib}:${solrCommonlib}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}">
+			<compilerarg value="-Xlint:all"/>
+		</javac>
+	</target>
+
+
+	<target name="dist" depends="compile"
+        description="generate the distribution" 
+        >
+	</target>
+      <!--
+      <target name="zip" depends="dist" description="generates the zip">
+        <mkdir dir="${dist}/lib" />
+        <copy file="${lucenelib}" tofile="${dist}/lib/${lucenelibdist}" />
+        <copy file="${mysqlib}" tofile="${dist}/lib/${mysqlibdist}" />
+        <zip destfile="lusql-core.zip">
+           <fileset dir="${dist}" />
+        </zip>
+      </target>
+     -->
+
+	<target name="docs" depends="compile">
+		<mkdir dir="${docs}"/>
+		<javadoc 
+             sourcepath="${src}"
+    	     classpath="${lucenelib}"
+             destdir="${docs}"
+             author="true"
+             version="true"
+           	 use="true"
+	         breakiterator="yes"
+             splitindex="true"
+             noindex="false"
+             windowtitle="${Name} API Documentation"
+             doctitle="&lt;font face='Verdana,Arial,sans-serif'>${Name}: Database to Lucene Index Generator&lt;/font>"
+             bottom="Copyright &#169; ${year} National Research Council"             
+    />
+	</target>
+
+
+	<target name="clean"
+        description="clean up" >
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+		<delete dir="${docs}"/>
+	</target>
+</project>

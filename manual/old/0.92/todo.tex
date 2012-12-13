@@ -1,0 +1,204 @@
+\label{todo}
+Here are a number of features planned for future versions.
+This list is not exhaustive, and will be altered by user feedback.
+
+\subsection{{\tt Properties} for command line arguments}
+The LuSql command line can get quite complicated for any non-trivial usage.
+With the additional functionality described in this list, it is likely to
+become more complex. 
+Being able to optionally put some or all of the configuration
+described in the command line parameters in a {\tt Properties} file would be
+useful. 
+
+\subsection{Test on other DBMS}
+Only MySql has been tested for v0.9.
+Other databases should be tested, such as IBM's 
+DB2, PostgreSql, Oracle, Derby, H2, etc.
+Prioritize?
+
+\subsection{Updating}
+\begin{mlist}
+\item Ability to indicate a field in previously created LuSql Lucene index as a
+primary key into the SQL {\tt ResultSet}, and use this key to do updates (i.e. query
+Lucene for the {\tt ResultSet} key field value; if not in Lucene add, otherwise move
+to the next {\tt ResultSet}).
+
+\item An automatically added timestamp field to be used for updates would also
+  be useful. 
+  I guess this can be done now with {\tt -g}.
+\end{mlist}
+
+
+
+
+\subsection{Logging, JUnit}
+Need to add:
+\begin{mlist}
+\item Logging
+\item JUnit tests
+\end{mlist}
+
+\subsection{Refactor {\tt LuSql.java}}
+{\tt LuSql.java} is a blob and needs to be refactored into several more OO,
+more testable and more independent classes.
+\begin{mlist}
+\item Central way to set default JDBC Connection, ResultSet, Statement values
+\item Get rid of {\tt -j} cruft (deprecated).
+\item Others...
+\end{mlist}
+
+\subsection{Robust Connection Failure Handling}
+In v0.9, if the JDBC connection fails, LuSql re-issues the query and loops
+over the {\tt ResultSet} until it gets to qwhere it left off.
+It then contunues indexing.
+However, this functionality was a late addition, and it is rather fragile.
+
+Need to improve this code.
+Refactoring of {\tt LuSql} class will help.
+
+\subsection{Per field weighting}
+Right now, all fields get the default weighting. 
+Need the ability to set the field weighting.
+Perhaps something like
+\begin{lstlisting}[backgroundcolor=\color{grey}]
+-w "id 0.75"  -w "author 0.90"
+\end{lstlisting}
+
+
+
+\subsection{Extend Subquery Functionality}
+\begin{mlist}
+
+\item Right now, subqueries are limited to the same database as the core query.
+There are use cases where the subquery needs to query another database, even
+on a different DBMS on a different machine (different connect URL, different
+driver).
+As this gets rather complicated, perhaps too complicated to add to the command
+line ar, this user access to this yet unimplemented functionality
+configuration will likely be pushed to the {\tt Properties}, above.
+
+Implications: access to these additional {\tt DataSource} might be needed in
+{\tt DBDocFilter}. Perhaps an abstract subclass with abstract methods
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Java]
+public class MultipleDBDocFilter
+    public void setDataSource(String key, DataSource ds);
+    public DataSource getDataSource(String key);
+\end{lstlisting}
+
+
+\item Right now, subqueries are run before the {\tt DocumentFilter}. 
+Need to be able to have run after using a command line argument toggle.
+
+\end{mlist}
+
+\subsection{Multiple Analyzers}
+\hypertarget{analyzer}
+Right now (v0.9) a single {\tt Analyzer} is applied to all fields.
+Need to allow for more than a single {\tt Analyzer}, i.e. the ability to map 
+  database record fields to different {\tt Analyzers}.
+Again, probably so complex need to do using {\tt Properties} file.
+Possible command line parameters:
+\begin{lstlisting}[backgroundcolor=\color{grey},language=Java]
+  -b "id org.apache.lucene.analysis.standard.SimpleAnalyzer"\  
+  -b "author org.apache.lucene.analysis.standard.SimpleAnalyzer" 
+\end{lstlisting}
+
+%\subsection{Use SOLR configuration}
+
+
+\subsection{Abstract data source}
+An abstract data source pluggable should be implemented, like SOLR's
+{\tt DataSource}\footnote{\url{http://lucene.apache.org/solr/api/org/apache/solr/handler/dataimport/DataSource.html}}
+and {\tt
+  DataImportHandler}\footnote{\url{http://wiki.apache.org/solr/DataImportHandler}}.
+
+\subsubsection{SPARQL}
+In addition to SQL and JDBC, extend to allow SPARQL\footnote{\url{http://en.wikipedia.org/wiki/SPARQL}}
+queries of a SPARQL
+end--point\footnote{\url{http://semanticweb.org/wiki/SPARQL_endpoint}} 
+and index the results.
+This could be done as a plugin.
+
+
+
+\subsection{Abstract indexing: data sink}
+The complement to the previous entry: have an abstract plug-in model for
+indexing, so other indexing technologies in addition to Lucene can be dropped
+in, such as Minion{\footnote{\url{https://minion.dev.java.net}},
+Xapian\footnote{\url{http://www.xapian.org}} (through Java bindings),
+Terrier\footnote{\url{http://ir.dcs.gla.ac.uk/terrier}},
+MG4J\footnote{\url{http://mg4j.dsi.unimi.it}} (Managing Gigabytes for Java),
+Lemur\footnote{\url{http://www.lemurproject.org}} (through Java bindings),
+etc. 
+
+
+\subsection{Alternatives for storage}
+For some use cases, using Lucene to store content may not be the best
+solution.
+For example, storing large volumes of content in very large Lucene indexes
+that need to be highly performant will see reduced performance due to this
+storage.
+Instead, putting the content in a simpler, faster content system such as 
+Berkeley
+DB\footnote{\url{http://www.oracle.com/technology/products/berkeley-db/index.html}},   
+Tokyo Cabinet\footnote{\url{http://tokyocabinet.sourceforge.net/index.html}},
+QDBM\footnote{\url{http://qdbm.sourceforge.net}}, or to an embedded DBMS, such
+as H2\footnote{\url{http://www.h2database.com}}, 
+Derby\footnote{\url{http://db.apache.org/derby}},
+or HSQLDB\footnote{\url{http://hsqldb.org}}, 
+or even back into a client-server DBMS might be a better technical solution. 
+
+All fields marked {\tt Field.Store.YES} using the {\tt NNN} syntax, do not
+store them in Lucene but store them using some other persistance technology,
+with an agreed--upon key to get the stored document. Have a plugin model for
+storing documents, while still indexing them with Lucene. 
+
+What about fields marked {\tt Field.Store.COMPRESS}? gzip first then store?
+
+
+
+\subsection{Multiple Parallel Indexes}
+Option to have multiple parallel indexes that are merged into a single index
+at the end of the indexing (needs approximately double the disk space).
+
+\subsection{Update to Lucene 2.4}
+\subsubsection{New and deprecated {\tt Field.Index}}
+Lucene 2.4 has added a new designation and changed the names of {\tt
+  Field.Index}: \\
+\noindent{\bf New\footnote{\url{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/document/Field.Index.html}}}\\
+{\tt Field.Index.ANALYZED\_NO\_NORMS} \\
+\noindent{\bf Deprecated:} \\
+{\tt Field.Index.TOKENIZED} renamed {\tt Field.Index.ANALYZED} \\
+{\tt Field.Index.UN\_TOKENIZED} renamed  {\tt Field.Index.NOT\_ANALYZED} \\
+{\tt Field.Index.NO\_NORM} renamed {\tt
+Field.Index.NOT\_ANALYZED\_NO\_NORMS}
+
+
+\subsection{Apache Commons DBCP}
+Need parameter to control the number of connections, initial size, wait time,
+etc in the pool.
+Right now, it uses the default
+values\footnote{\url{http://commons.apache.org/dbcp/configuration.html}}. 
+
+
+
+
+\subsection{Roadmap}
+\subsubsection{V1.0}
+Bug fixes.
+
+\subsubsection{V1.01}
+Code clean-up; refactor; bug fixes.
+\subsubsection{V1.02}
+Update to Lucene 2.4.x.
+
+\subsubsection{V1.03}
+{\tt Properties}
+
+\subsubsection{V1.04}
+Multiple analyzers.
+
+
+\subsection{Changes}
+\subsubsection{v0.9 2008 11 10}
+Initial Release.

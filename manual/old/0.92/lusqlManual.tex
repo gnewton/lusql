@@ -1,0 +1,220 @@
+\documentclass{article}[14pt]
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{lineno}
+\usepackage{graphicx} 
+\usepackage{lscape}
+\usepackage[pdftex]{thumbpdf}
+%\usepackage{draftcopy}
+%\usepackage{drafwatermark}
+\usepackage{listings}
+\usepackage{timestamp}
+%%%\usepackage{keyval}
+\usepackage[usenames]{color}
+\usepackage{type1cm}
+\usepackage{eso-pic}
+
+%%%%\usepackage{hyperxmp}
+%%\usepackage{tikz}
+
+ \hypersetup{breaklinks=true,
+   pdfpagemode=UseOutlines,
+   pdffitwindow=true,
+   bookmarksopenlevel=3,
+   bookmarksnumbered=true
+ }
+
+\oddsidemargin 0.0in
+\evensidemargin 1.0in
+\textwidth 6.5in
+%\headheight 1.0in
+%\topmargin 0.5in
+%\textheight 9.0in
+
+
+\newenvironment{mlist}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0mm} \setlength{\parsep}{1mm} }}{\end{list}}
+
+\newenvironment{widepar}%
+  {\setlength{\rightskip}{-15mm}\addtolength{\rightskip}{15mm}}{\par}
+
+\pagestyle{fancy}
+%\setlength{\parindent}{0in}
+
+%\fancyfoot[C]{{\small \sc \copyright 2008 National Research Council Canada \\ \thepage }}  
+
+
+\definecolor{grey}{rgb}{.9,.9,.9}
+
+%\lstset{pascal}
+\lstset{
+  basicstyle=\small\ttfamily,
+  numbers=none,
+  numberstyle=\tiny,numbersep=5pt,
+  escapeinside={(*@}{@*)},
+  basicstyle=\small, % print whole listing small
+  keywordstyle=\bfseries,% underlined bold black keywords
+%  commentstyle=\color{white}, % white comments
+  stringstyle=\ttfamily, % typewriter type for strings
+ showstringspaces=false % no special string spaces
+}
+
+\hypersetup{%
+pdftitle = {LuSql 1.0$\beta$ User Manual},
+pdfsubject = {},
+pdfkeywords = {Lucene, SQL, MySQL, indexing},
+pdfauthor = {Glen Newton},
+pdfcreator = {PDFLatex},
+}
+
+
+\title{LuSql v1.0$\beta$ User Manual}
+\author{Glen Newton \\
+  {\ttfamily \href{mailto:glen.newton@nrc-cnrc.gc.ca}{glen.newton@nrc-cnrc.gc.ca}\footnote{\url{http://lab.cisti-icist.nrc-cnrc.gc.ca/cistilabswiki/index.php/Glen_Newton}}
+}\\
+    Canada Institute for Scientific and Technical Information (CISTI)\footnote{\url{http://cisti-icist.nrc-cnrc.gc.ca}}\\
+    National Research Council
+    Canada\footnote{\url{http://www.nrc-cnrc.gc.ca}}
+  }
+\date{\today}
+
+%Watermark that works in PDFLates
+%  From:
+%  http://jeanmartina.blogspot.com/2008/07/latex-goodie-how-to-watermark-things-in.html
+
+%%%% Comment out hte below for draft mode:::
+% \makeatletter
+% \AddToShipoutPicture{%
+% \setlength{\@tempdimb}{.5\paperwidth}%
+% \setlength{\@tempdimc}{.5\paperheight}%
+% \setlength{\unitlength}{1pt}%
+% \put(\strip@pt\@tempdimb,\strip@pt\@tempdimc){%
+% \makebox(0,0){\rotatebox{45}{\textcolor[gray]{0.95}%
+% {\fontsize{3cm}{3cm}\selectfont{DRAFT}}}}%
+% \makebox(-100,-300){\rotatebox{45}{\textcolor[gray]{0.95}%
+% {\fontsize{2cm}{2cm}\selectfont{Do not distribute}}}}
+% \makebox(-500,-0){\rotatebox{90}{\textcolor[gray]{0.95}%
+% {\fontsize{0.7cm}{0.7cm}\selectfont{\timestamp}}}}
+% }%
+% }
+%\makeatother
+
+
+
+\begin{document}
+\maketitle
+\begin{abstract}
+LuSql is a simple yet powerful high-performance tool for building Lucene
+indexes from relational databases. 
+It is a command-line Java application that builds a Lucene 
+index from an arbitrary SQL query of a JDBC accessible SQL database.
+It allows a user to control a number of parameters, including the
+SQL query to use,
+individual indexing/storage/term-vector nature of fields, 
+analyzer, 
+stop word list, 
+and other tuning parameters.
+In its default mode, it uses threading to take advantage of multiple
+cores.
+It can handle complex queries, allows for additional per record
+sub-queries, and has a plug-in architecture for arbitrary document
+manipulation.  
+Its only dependencies are the the Lucene core, 
+three Apache Commons libraries, 
+and a JDBC driver.
+
+
+%% \Acrobatmenu{Print}{Print}
+%% \Acrobatmenu{ZoomIn}{+}
+%% \Acrobatmenu{ZoomOut}{-}
+
+\thispagestyle{empty}
+\vspace*{5cm}
+\begin{center}
+{\sc \copyright 2008 National Research Council Canada }
+
+\vspace*{5mm}
+  \href{http://creativecommons.org/licenses/by-sa/2.5/ca/}{\includegraphics[width=2cm]{images/creativeCommons.png}}
+\end{center}
+
+\end{abstract}
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+%\linenumbers
+
+
+\section{Introduction}
+\input{intro}
+
+\section{Download and Installation}
+\input{downInstall}
+
+
+\section{Command Line Arguments}
+\input{cli}
+
+\section{Tutorial}
+\input{tutorial}
+
+\section{Filter plugin}
+\input{filter}
+
+\section{Performance}
+\input{performance}
+
+\section{Acknowledgements}
+\input{ack}
+
+\newpage
+\appendix
+\section{LuSql license, copyright and authorship}
+\input{license}
+
+\newpage
+\section{TODO}
+\input{todo}
+
+\newpage
+\section{Indexing Parameters for arguments {\tt -i} and {\tt -I}}
+\input{fieldParameters}
+
+\newpage
+\section{Hardware, software, OS used in examples}
+\input{hardware}
+
+\newpage
+\section{MySQL Tutorial Tables for Examples 2--4}
+\input{myTables}
+
+\newpage
+\section{LuSql Output: Examples 2--4}
+\input{lusqlOutput}
+
+\newpage
+\section{Example 4 Full-text Filter Source Code}
+\input{filterSource}
+
+
+\section{About this document}
+\noindent This document was prepared using \LaTeX \ and pdfeTeX, Version
+3.141592-1.21a-2.2 (Web2C 7.5.4) on a Dell desktop running SUSE LINUX 10.0
+(X86-64). 
+The following \LaTeX \  packages were used: {\tt fancyhdr, type1cm, hyperref, lineno, graphicx,
+lscape, pdftex, listings, timestamp, color, eso-pic}.
+
+\noindent Table \ref{tables} was prepared using
+Graphviz\footnote{http://www.graphviz.org/} {\tt dot}\footnote{http://www.graphviz.org/pdf/dotguide.pdf}.
+
+
+\begin{figure}[h]
+  \begin{center}
+\vspace*{5mm}
+  \href{http://www.gnu.org/software/emacs/}{\includegraphics[width=2cm]{images/emacs.png}}
+   \end{center}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%

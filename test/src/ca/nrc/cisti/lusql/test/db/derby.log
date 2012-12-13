@@ -1,0 +1,6 @@
+----------------------------------------------------------------
+2009-09-08 21:02:44.641 GMT:
+ Booting Derby version The Apache Software Foundation - Apache Derby - 10.4.1.3 - (648739): instance a816c00e-0123-9b77-365f-000001cc2200
+on database directory /home/gnewton/2009/08Aug19/0.92b/test/src/ca/nrc/cisti/lusql/test/db/testdb/jdbcDemoDB  
+
+Database Class Loader started - derby.database.classpath=''
