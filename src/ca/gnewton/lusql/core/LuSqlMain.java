@@ -23,7 +23,7 @@ import ca.gnewton.lusql.util.*;
 public class LuSqlMain
     implements LuceneFields, LuSqlFields, LocalAnnotation
 {
-	//static Category cat = Category.getInstance(LuSql.class.getName());
+	static Category cat = Category.getInstance(LuSql.class.getName());
     static
     {
 	    BasicConfigurator.configure();
@@ -945,8 +945,6 @@ public class LuSqlMain
 				if(plugin instanceof DocSink)
 					pluginType = "Sink";
 				Properties ex = plugin.explainProperties();
-				if(i > 0)
-					System.err.println("\n------------------------------------------------------------");
 				System.err.println(explain[i]);
 				System.err.println("Description: " + plugin.description());
 

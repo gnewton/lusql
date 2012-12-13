@@ -11,7 +11,7 @@
 	<!-- global properties for this build -->
 
 	<property name="Name" value="LuSql"/>
-	<property name="version" value="3.61"/>
+	<property name="version" value="3.6.1a"/>
 	<property name="src" location="./src"/>
 	<property name="build" location="./build"/>
 	<property name="dist"  location="dist"/>

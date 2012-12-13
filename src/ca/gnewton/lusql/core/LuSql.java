@@ -902,10 +902,6 @@ public class LuSql
 				//cat.info("DocSource: " + getDocSourceClassName());
 			}
 		Annotation a = docSourceClass.getAnnotation(PluginParameter.class) ;
-		System.out.println("--------- " 
-		                   + getDocSourceClassName()
-		                   + ": "
-		                   + a);
 		Constructor constructor = docSourceClass.getConstructor();
 		DocSource source = (DocSource)constructor.newInstance();
 

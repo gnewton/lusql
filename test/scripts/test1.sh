@@ -1,6 +1,8 @@
 
 #!/bin/bash
 #export verbose="-v"
+export CLASSPATH=../../../dist/lib/lusql.jar:../../lib/derby.jar
+
 export verbose=""
 
 export n="10001"
@@ -11,11 +13,10 @@ export DerbyDB_Lucene=testindex6_derbyTestDB1_luceneIndex
 export DerbyDB_BDB=testindex7_derbyTestDB1_bdb
 export SPARQL_Lucene=testindex8_sparql_luceneIndex
 
-rm -r $testDir
+#############
+rm -r $testDir &> /dev/null
 mkdir $testDir
 cd $testDir
-
-export CLASSPATH=../../../dist/lib/lusql.jar:../../lib/derby.jar
 
 echo "Test 1: Integer to Lucene"
 time java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource -I ANALYZED:NO:WITH_POSITIONS_OFFSETS  -n ${n} -l testindex1   ${verbose}
@@ -44,7 +45,6 @@ echo " Test 5: Lucene to Lucene: complete"
 echo ""
 echo "Test 6: Simple JDBC to Lucene"
 echo " Creating Derby database: $DerbyDB" 
-echo $CLASSPATH
 time java ca.gnewton.lusql.test.CreateTestDB $DerbyDB 500 200 2 $TextZipFile
 
 time java ca.gnewton.lusql.core.LuSqlMain  -c jdbc:derby:${DerbyDB} -d org.apache.derby.jdbc.EmbeddedDriver   -q "select * from article" -m 50 -l $DerbyDB_Lucene   ${verbose}
@@ -67,6 +67,7 @@ java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.sparql.SparQLDo
 echo " Test 9: complete"
 
 
+############################
 cd ..
 rm -r $testDir
 
