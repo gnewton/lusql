@@ -54,10 +54,9 @@ public class SerializeDocSink
 		try 
 		{
 		    oo = new ObjectOutputStream(
-			new GZIPOutputStream(
-			    new FileOutputStream(getIndexDirName()) 
-			    ,1024*1024)
-			//, 4096)
+		                                new GZIPOutputStream(
+		                                                     new FileOutputStream(getIndexDirName()) 
+		                                                     ,1024*32)
 			);
 		} 
 		catch (Throwable t) 

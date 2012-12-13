@@ -4,9 +4,9 @@
 export CLASSPATH=../../../dist/lib/lusql.jar:../../lib/derby.jar
 
 export verbose=""
-export cleanup=0
+export cleanup=1
 
-export n="10000000"
+export n="100"
 export TextZipFile=../1399-8.zip
 export testDir=testDir
 export DerbyDB=derbyTestDB1
@@ -41,7 +41,21 @@ end
 
 start "Integer to BDB"
 bdbNum=$testNum
-time java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource -I ANALYZED:NO:WITH_POSITIONS_OFFSETS -n ${n} -l testindex2_integer_bdb -si ca.gnewton.lusql.driver.bdb.BDBDocSink -P id  ${verbose}
+time java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource -I ANALYZED:NO:WITH_POSITIONS_OFFSETS -n ${n} -l testindex${testNum}_integer_bdb -si ca.gnewton.lusql.driver.bdb.BDBDocSink -P id  ${verbose}
+end
+
+
+start "Integer to Null"
+time java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource -I ANALYZED:NO:WITH_POSITIONS_OFFSETS -n ${n} -l testindex${testNum}_integer_null -si ca.gnewton.lusql.driver.faux.NullDocSink
+end
+
+start "Integer to Serialize"
+serializeNum=$testNum
+time java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource -I ANALYZED:NO:WITH_POSITIONS_OFFSETS -n ${n} -l testindex${testNum}_integer_serialize -si ca.gnewton.lusql.driver.serialize.SerializeDocSink
+end
+
+start "Serialize to Lucene"
+time java ca.gnewton.lusql.core.LuSqlMain -so ca.gnewton.lusql.driver.serialize.SerializeDocSource -I ANALYZED:NO:WITH_POSITIONS_OFFSETS -n ${n} -c testindex${serializeNum}_integer_serialize  -l testindex${testNum}_serialize_lucene
 end
 
 
@@ -85,7 +99,7 @@ end
 
 
 start "JDBC to CSV"
-time java ca.gnewton.lusql.core.LuSqlMain  -c jdbc:derby:testindexDerby${jdbcNum} -d org.apache.derby.jdbc.EmbeddedDriver   -q "select id, title, contents from article" -Q "ID|select Author.name from articleAuthorJoin, author where articleAuthorJoin.articleId=@ and articleAuthorJoin.authorId=author.id" -m 50 -l $DerbyDB_Lucene   ${verbose} -si ca.gnewton.lusql.driver.file.CSVPrintDocSink > testindex_sparql_csv_${testNum}.csv
+time java ca.gnewton.lusql.core.LuSqlMain  -c jdbc:derby:testindexDerby${jdbcNum} -d org.apache.derby.jdbc.EmbeddedDriver   -q "select id, title, contents from article" -Q "ID|select Author.name from articleAuthorJoin, author where articleAuthorJoin.articleId=@ and articleAuthorJoin.authorId=author.id" -m 50 -l $DerbyDB_Lucene   ${verbose} -si ca.gnewton.lusql.driver.csv.CSVPrintDocSink > testindex_sparql_csv_${testNum}.csv
 end
 
 

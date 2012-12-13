@@ -211,10 +211,6 @@ public class LuSql
 	 */
 	private String docSinkClassName=DefaultDocSinkClassName;
 
-	/**
-	 * Describe ConcurrentDocSink here.
-	 */
-	private boolean ConcurrentDocSink = false;
 
 	/**
 	 * Describe primaryKeyField here.
@@ -1704,23 +1700,6 @@ public class LuSql
 		this.docSinkClassName = newDocSinkClassName;
 	}
 
-	/**
-	 * Get the <code>ConcurrentDocSink</code> value.
-	 *
-	 * @return a <code>boolean</code> value
-	 */
-	public final boolean isConcurrentDocSink() {
-		return ConcurrentDocSink;
-	}
-
-	/**
-	 * Set the <code>ConcurrentDocSink</code> value.
-	 *
-	 * @param newConcurrentDocSink The new ConcurrentDocSink value.
-	 */
-	public final void setConcurrentDocSink(final boolean newConcurrentDocSink) {
-		this.ConcurrentDocSink = newConcurrentDocSink;
-	}
 
 	/**
 	 * Get the <code>PrimaryKeyField</code> value.

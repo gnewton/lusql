@@ -6,15 +6,6 @@ import java.util.zip.*;
 import ca.gnewton.lusql.core.*;
 import ca.gnewton.lusql.util.*;
 
-/**
- * Describe class SerializeDocSource here.
- *
- *
- * Created: Fri May  1 15:08:26 2009
- *
- * @author <a href="mailto:gnewton@">Glen Newton</a>
- * @version 1.0
- */
 public class SerializeDocSource 
     extends AbstractDocSource 
 {
@@ -22,27 +13,14 @@ public class SerializeDocSource
 	{
 	    return "Source that reads serialized LuSql's internal Doc object from disk. Only works with files created with ca.gnewton.lusql.driver.serialize.SerializeDocSink.";
 	} 
-    /**
-     * Describe supportsCompression here.
-     */
+
     private boolean supportsCompression;
     ObjectInputStream oi;
-    /**
-     * Creates a new <code>SerializeDocSource</code> instance.
-     *
-     */
+
     public SerializeDocSource() {
 
     }
 
-// Implementation of ca.gnewton.lusql.core.Plugin
-
-    /**
-     * Describe <code>init</code> method here.
-     *
-     * @param properties a <code>Properties</code> value
-     * @exception PluginException if an error occurs
-     */
     public final void init(final MultiValueProp p) throws PluginException 
 	{
 	    if(!p.containsKey(LuSqlFields.SourceLocationKey))
@@ -52,10 +30,10 @@ public class SerializeDocSource
 	    try 
 	    {
 		oi = new ObjectInputStream(
-		    //new GZIPInputStream(
-					   new FileInputStream(p.getProperty(LuSqlFields.SinkLocationKey).get(0))
-			//,1024*1024)
-			);
+		                           new GZIPInputStream(
+		                                               new FileInputStream(p.getProperty(LuSqlFields.SinkLocationKey).get(0))
+		                                               ,1024*32)
+		                           );
 	    } 
 	    catch (Throwable t) 
 	    {

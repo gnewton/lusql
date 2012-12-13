@@ -1,4 +1,4 @@
-package ca.gnewton.lusql.driver.file;
+package ca.gnewton.lusql.driver.csv;
 import ca.gnewton.lusql.core.*;
 import java.util.concurrent.locks.*;
 import java.io.*;
@@ -24,28 +24,21 @@ public class CSVPrintDocSink
 	{
 		return false;
 	}
-	/**
-	 * Describe indexName here.
-	 */
 	private String indexName;
 
-	int addDocHintSize = 100;
+	private int addDocHintSize = 100;
 	public int getAddDocSizeHint()
 	{
 		return addDocHintSize;
 	}
 
-	/**
-	 * Creates a new <code>CSVPrintDocSink</code> instance.
-	 *
-	 */
 	public CSVPrintDocSink() 
 	{
 
 	}
 
 
-	CsvWriter writer = null;
+	private CsvWriter writer = null;
 	
 	@Override
 	public void init(MultiValueProp p) throws PluginException
@@ -95,9 +88,8 @@ public class CSVPrintDocSink
 
 	}
 
-
-	Lock l = new ReentrantLock();
-	int count = 0;
+	private Lock l = new ReentrantLock();
+	private int count = 0;
 
 	@Override
 	public void addDoc(Doc[] docList)  throws DocSinkException
@@ -139,6 +131,7 @@ public class CSVPrintDocSink
 	{
 		return false;
 	}
+
 	@Override
 	public boolean isRemoveOnDone()
 	{
@@ -150,6 +143,7 @@ public class CSVPrintDocSink
 	{
 
 	}
+
 	public void setRemoveOnDone(boolean b)
 	{
 
@@ -167,20 +161,10 @@ public class CSVPrintDocSink
 			maxDisplayFieldSize = Integer.parseInt(p.getProperty("fieldSize").get(0));
 	}
 
-	/**
-	 * Get the <code>IndexName</code> value.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	public final String getIndexName() {
 		return indexName;
 	}
 
-	/**
-	 * Set the <code>IndexName</code> value.
-	 *
-	 * @param newIndexName The new IndexName value.
-	 */
 	public final void setIndexName(final String newIndexName) {
 		this.indexName = newIndexName;
 	}

@@ -4,64 +4,64 @@ import java.io.*;
 import java.util.concurrent.locks.*;
 
 public class ByteCountingOutputStream
-    extends OutputStream
+	extends OutputStream
 {
-    private final ReentrantLock lock = new ReentrantLock();
-    public int bytes = 0;
+	private final ReentrantLock lock = new ReentrantLock();
+	public int bytes = 0;
 
-    OutputStream os = null;
+	OutputStream os = null;
     
-    public ByteCountingOutputStream(OutputStream newInternal)
+	public ByteCountingOutputStream(OutputStream newInternal)
 	{
-	    os = newInternal;
+		os = newInternal;
 	}
 
-    public void close()
-	throws IOException
-    {
-	os.close();
-	System.err.println("ByteCountingOutputStream kbytes=" + bytes);
-    }
+	public void close()
+		throws IOException
+	{
+		os.close();
+		System.err.println("ByteCountingOutputStream kbytes=" + bytes);
+	}
 
-    public void flush()
-	throws IOException
-    {
-	os.flush();
-    }
+	public void flush()
+		throws IOException
+	{
+		os.flush();
+	}
 
-    public void write(byte[] b)
-	throws IOException
-    {
-	os.write(b);
-	incrementBytes(b.length);
-    }
+	public void write(byte[] b)
+		throws IOException
+	{
+		os.write(b);
+		incrementBytes(b.length);
+	}
 
-    public void write(byte[] b, int off, int len)
-	throws IOException
-    {
-	os.write(b,off,len);
-	incrementBytes(len - off);
-    }
+	public void write(byte[] b, int off, int len)
+		throws IOException
+	{
+		os.write(b,off,len);
+		incrementBytes(len - off);
+	}
 
-    public void write(int b) 
-	throws IOException
-    {
-	os.write(b);
-	incrementBytes(1);
-    }
+	public void write(int b) 
+		throws IOException
+	{
+		os.write(b);
+		incrementBytes(1);
+	}
 
 
-    void incrementBytes(int n)
-    {
-	lock.lock(); 
-	try
-	    {
-		bytes += n;
-	    }
-	finally
-	    {
-		lock.unlock();
-	    }
-    }
+	void incrementBytes(int n)
+	{
+		lock.lock(); 
+		try
+			{
+				bytes += n;
+			}
+		finally
+			{
+				lock.unlock();
+			}
+	}
     
 }

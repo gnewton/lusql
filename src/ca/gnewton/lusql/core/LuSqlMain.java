@@ -198,14 +198,11 @@ public class LuSqlMain
 
 	    //
 
-	    System.err.println("**************************************");
-
 	    try
 			{
 				System.err.print(lusql.getDocSource().showState(0));
 				System.err.print(lusql.getDocSink().showState(0));
 			}
-	    
 	    catch(Throwable t)
 			{
 				t.printStackTrace();
@@ -543,7 +540,6 @@ public class LuSqlMain
 			for(int i=0; i<sind.length; i++)
 				{
 					lusql.addSecondaryIndexName(sind[i]);
-					lusql.setConcurrentDocSink(true);
 				}
 
 	    if(line.hasOption("J"))
