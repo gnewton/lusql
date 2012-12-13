@@ -9,37 +9,37 @@ import java.nio.charset.Charset;
 
 
 public class CSVPrintDocSink 
-    extends AbstractDocSink
+	extends AbstractDocSink
 {
-    int maxDisplayFieldSize = 256;
+	int maxDisplayFieldSize = 256;
     
-    @Override
-    public String description()
+	@Override
+	public String description()
 	{
-	    return "Sink that prints out the docs as csv";
+		return "Sink that prints out the docs as csv";
 	}
 
-    @Override
-    public boolean requiresPrimaryKeyField()
+	@Override
+	public boolean requiresPrimaryKeyField()
 	{
-	    return false;
+		return false;
 	}
-    /**
-     * Describe indexName here.
-     */
-    private String indexName;
+	/**
+	 * Describe indexName here.
+	 */
+	private String indexName;
 
-    int addDocHintSize = 100;
-    public int getAddDocSizeHint()
+	int addDocHintSize = 100;
+	public int getAddDocSizeHint()
 	{
-	    return addDocHintSize;
+		return addDocHintSize;
 	}
 
-    /**
-     * Creates a new <code>CSVPrintDocSink</code> instance.
-     *
-     */
-    public CSVPrintDocSink() 
+	/**
+	 * Creates a new <code>CSVPrintDocSink</code> instance.
+	 *
+	 */
+	public CSVPrintDocSink() 
 	{
 
 	}
@@ -47,138 +47,143 @@ public class CSVPrintDocSink
 
 	CsvWriter writer = null;
 	
-    @Override
-    public void init(MultiValueProp p) throws PluginException
+	@Override
+	public void init(MultiValueProp p) throws PluginException
 	{
-	    setSupportsWritingToStdout(true);
-	    extractProperties(p);	    
-	    try
-	    {
-		if(getIndexName() != null)
-			writer = new CsvWriter(new FileOutputStream(getIndexName()), ',', Charset.forName("UTF-8"));
-		
-	    }
-	    catch(Throwable t)
-	    {
-		t.printStackTrace();
-		throw new PluginException();
-	    }
-	}
-
-    @Override
-    public Properties explainProperties()
-	{
-	    return null;
-	}
-
-    @Override
-    public void done() throws PluginException
-	{
-	    try
-	    {
-		if(writer != null)
-		    writer.flush();
-		    writer.close();
-	    }
-	    catch(Throwable t)
-	    {
-		throw new PluginException();
-	    }
-
-	}
-
-
-    Lock l = new ReentrantLock();
-    int count = 0;
-
-    @Override
-    public void addDoc(Doc[] docList)  throws DocSinkException
-	{
-
-	    for(Doc doc: docList)
-		{
-		    l.lock();		    
-		    try {
-				//Map<String, List<String>> fields = doc.getFields();
-
-				TreeMap<String, List<String>> fields = new TreeMap<String, List<String>>(doc.getFields());
-				Iterator<String> it = fields.keySet().iterator();
-
-			while(it.hasNext())
-			    {
-				String key = it.next();
-		        System.out.println("key=" + key + "  value=" + fields.get(key).get(0));
+		setSupportsWritingToStdout(true);
+		extractProperties(p);	    
+		try
+			{
+				if(getIndexName() != null){
+					writer = new CsvWriter(new FileOutputStream(getIndexName()), ',', Charset.forName("UTF-8"));
 				}
+				else
+					{
+						writer = new CsvWriter(System.out, ',', Charset.forName("UTF-8"));
+					}
+				
+		
 			}
+		catch(Throwable t)
+			{
+				t.printStackTrace();
+				throw new PluginException();
+			}
+	}
+
+	@Override
+	public Properties explainProperties()
+	{
+		return null;
+	}
+
+	@Override
+	public void done() throws PluginException
+	{
+		try
+			{
+				if(writer != null)
+					{
+						writer.flush();
+						writer.close();
+					}
+			}
+		catch(Throwable t)
+			{
+				throw new PluginException();
+			}
+
+	}
+
+
+	Lock l = new ReentrantLock();
+	int count = 0;
+
+	@Override
+	public void addDoc(Doc[] docList)  throws DocSinkException
+	{
+		for(Doc doc: docList)
+			{
+				l.lock();		    
+				try {
+					Map<String, List<String>> fields = doc.getFields();
+					Iterator<String> iterator = fields.keySet().iterator();
+					while(iterator.hasNext()){
+						String key = iterator.next();
+						List<String>keyFields = fields.get(key);
+						writer.write(keyFields.get(0));
+					}
+					writer.endRecord();
+				}
 			
-		    catch(Throwable t)
-			{
-			    t.printStackTrace();
-			    throw new DocSinkException();
+				catch(Throwable t)
+					{
+						t.printStackTrace();
+						throw new DocSinkException();
+					}
+				finally 
+					{
+						l.unlock();
+					}
 			}
-		    finally 
-			{
-			    l.unlock();
-			}
-		}
 	}
     	    
 
-    public Object internal()  throws DocSinkException
+	public Object internal()  throws DocSinkException
 	{
-	    return null;
+		return null;
 	}
 
-    @Override
-    public boolean isThreaded()
+	@Override
+	public boolean isThreaded()
 	{
-	    return false;
+		return false;
 	}
-    @Override
-    public boolean isRemoveOnDone()
+	@Override
+	public boolean isRemoveOnDone()
 	{
-	    return false;
+		return false;
 	}
 
-    @Override
-    public void commit() throws DocSinkException
-	{
-
-	}
-    public void setRemoveOnDone(boolean b)
+	@Override
+	public void commit() throws DocSinkException
 	{
 
 	}
-    public void setPrimaryKeyField(String f)
+	public void setRemoveOnDone(boolean b)
+	{
+
+	}
+	public void setPrimaryKeyField(String f)
 	{
 
 	}
 
-    void extractProperties(MultiValueProp p)
+	void extractProperties(MultiValueProp p)
 	{
-	    if(p.containsKey("index"))
-		setIndexName(p.getProperty("index").get(0));
-	    if(p.containsKey("fieldSize"))
-		maxDisplayFieldSize = Integer.parseInt(p.getProperty("fieldSize").get(0));
+		if(p.containsKey("index"))
+			setIndexName(p.getProperty("index").get(0));
+		if(p.containsKey("fieldSize"))
+			maxDisplayFieldSize = Integer.parseInt(p.getProperty("fieldSize").get(0));
 	}
 
-    /**
-     * Get the <code>IndexName</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getIndexName() {
-	return indexName;
-    }
+	/**
+	 * Get the <code>IndexName</code> value.
+	 *
+	 * @return a <code>String</code> value
+	 */
+	public final String getIndexName() {
+		return indexName;
+	}
 
-    /**
-     * Set the <code>IndexName</code> value.
-     *
-     * @param newIndexName The new IndexName value.
-     */
-    public final void setIndexName(final String newIndexName) {
-	this.indexName = newIndexName;
-    }
+	/**
+	 * Set the <code>IndexName</code> value.
+	 *
+	 * @param newIndexName The new IndexName value.
+	 */
+	public final void setIndexName(final String newIndexName) {
+		this.indexName = newIndexName;
+	}
 
 
 }

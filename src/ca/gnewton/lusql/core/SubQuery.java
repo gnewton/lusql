@@ -46,7 +46,7 @@ public class SubQuery
      */
     public SubQuery(String s, String globalP) 
 	{
-	    System.out.println("SubQuery: " + s + "  :: " + globalP);
+		//System.out.println("SubQuery: " + s + "  :: " + globalP);
 	    try
 	    {
 		// This subquery should be cached...

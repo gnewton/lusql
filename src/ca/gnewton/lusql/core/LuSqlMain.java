@@ -368,7 +368,7 @@ public class LuSqlMain
 			}
 
 
-	    if(line.hasOption("stdout"))
+	    if(line.hasOption("stdout")||line.hasOption("o"))
 			{
 				lusql.setSinkWriteToStdout(true);
 			}
@@ -973,7 +973,7 @@ public class LuSqlMain
 	    String initFile = lusql.getSinkLocationName() + LuSqlInfoSuffix;
 	    try
 			{
-				infoOut = new BufferedWriter(new FileWriter(initFile));
+				//infoOut = new BufferedWriter(new FileWriter(initFile));
 			}
 	    catch(Throwable t)
 			{

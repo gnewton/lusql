@@ -100,10 +100,7 @@ public class SubQueryJoinFilter
 			    
 			    if(fields != null)
 			    {
-				//System.out.println("Cache hit********************************************");
-				//System.out.println(query);
-				
-				return getFromCache(doc, fields);
+				    return getFromCache(doc, fields);
 			    }
 			}
 			++miss;
@@ -129,7 +126,6 @@ public class SubQueryJoinFilter
 		// Query 
 		
 
-		//System.out.println("Subquery=" + query);
 		try
 		{
 		    //rs = new ReadOnlyResultSet(stmt, query);
