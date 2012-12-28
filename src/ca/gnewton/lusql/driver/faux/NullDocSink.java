@@ -61,17 +61,21 @@ public class NullDocSink
 	    // FIXX
 	    return null;
 	}
-    
-    public void addDoc(Doc[] docList)  
+	
+	long count = 0l;
+	public void addDoc(Doc[] docList)  
 	throws DocSinkException
 	{
-
+		count += (long)(docList.length);
 	}
 
     public void done()  
 	throws PluginException
 	{
-
+		System.out.println();
+		System.out.println("Num docs=" + count);
+		System.out.println();
+		
 	}
 
     public Object internal()

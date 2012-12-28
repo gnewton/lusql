@@ -73,7 +73,6 @@ public class LuceneDocSource
 		    search = true;
 		
 		//IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, ana).setRAMBufferSizeMB(getRAMBufferSize());
-
 		reader = IndexReader.open(FSDirectory.open(new File(getSourceLocation())), 
 					  true);
 

@@ -538,8 +538,11 @@ public class LuSql
 				if(doc == null)
 					continue;
 		    
-				if(doc.isLast())
+				if(doc.isLast()){
+					System.out.println("LuSql: islast");
 					break;
+				}
+				
 				docs[n] = doc;
 				n++;
 				count++;
@@ -552,14 +555,15 @@ public class LuSql
 					}
 			}
 		// flush out the last
-		Doc[] endDocs = new Doc[n];
+		Doc[] endDocs = new Doc[n+1];
 		for(int i=0; i<n; i++)
 			{
 				endDocs[i] = docs[i];
 			}
+		Doc lastDoc = new DocImp();
+		lastDoc.setLast(true);
+		endDocs[n] = lastDoc;
 		addDoc(endDocs);
-	    
-		
 	}
      
 

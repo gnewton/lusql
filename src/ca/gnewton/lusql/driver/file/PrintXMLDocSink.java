@@ -56,7 +56,7 @@ public class PrintXMLDocSink
 			{
 
 				//output = new BufferedWriter(new FileWriter(new File(getIndexName())));
-				if(getWritingToStdout())
+				if(getWritingToStdout() || true)
 					{
 						output = new BufferedOutputStream(
 						                                  System.out

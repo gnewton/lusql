@@ -27,6 +27,8 @@
         <property name="jenaArq" value="lib/jena-arq.jar"/>
         <property name="jenaCore" value="lib/jena-core.jar"/>
         <property name="jenaIri" value="lib/jena-iri.jar"/>
+        <property name="json" value="lib/json-simple.jar"/>
+
         <property name="log4j" value="lib/log4j.jar"/>
         <property name="lucene" value="lib/lucene-core.jar" />
         <property name="mysql" value="lib/mysql-connector-java-bin.jar"/>
@@ -57,7 +59,7 @@
 		<javac 
            srcdir="${src}"
            destdir="${build}"
-		   classpath="${lucene}:${dbcp}:${pool}:${cli}:${mysq}:${bdb}:${solrj}:${snow}:${solrCommon}:${ant}:${log4j}:${csv}:${jenaArq}:${jenaCore}:${jenaIri}:${xerces}:${xmlApi}:${slf4jApi}:${slf4jlog4j}"
+		   classpath="${lucene}:${dbcp}:${pool}:${cli}:${mysq}:${bdb}:${solrj}:${snow}:${solrCommon}:${ant}:${log4j}:${csv}:${jenaArq}:${jenaCore}:${jenaIri}:${xerces}:${xmlApi}:${slf4jApi}:${slf4jlog4j}:${json}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            optimize="${compule.optimize}">

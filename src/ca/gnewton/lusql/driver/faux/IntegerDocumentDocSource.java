@@ -56,7 +56,7 @@ public class IntegerDocumentDocSource
 
 	}
 
-	int i = 0;
+	long i = 0;
 	// Implementation of ca.gnewton.lusql.core.DocSource
 
 	Random r = new Random();
@@ -71,7 +71,7 @@ public class IntegerDocumentDocSource
 	public final static String SimpleIntField = "intField";
 	public final static String FakeTextField = "fakeTextField";
     
-	int count = 0;
+	long count = 0;
     
 	public final Doc next() throws DataSourceException 
 	{
@@ -80,11 +80,11 @@ public class IntegerDocumentDocSource
 		++count;
 	
 		Doc doc = new DocImp();
-		doc.addField(PrimaryKeyField, Integer.toString(i));
-		doc.addField(SimpleIntField, Integer.toString(i*7));
+		doc.addField(PrimaryKeyField, Long.toString(i));
+		doc.addField(SimpleIntField, Long.toString(i*7));
 		StringBuilder sb = new StringBuilder();
 	
-		for(int j=0; j<r.nextInt(numDocs); j++)
+		for(long j=0; j<r.nextInt(7)+1; j++)
 			sb.append("word" + r.nextInt(100000) + " ");
 		doc.addField(FakeTextField, sb.toString());
 	
@@ -97,14 +97,13 @@ public class IntegerDocumentDocSource
 	}
 
     
-	int numDocs = 5000;
+	long numDocs = 100000;
 
 	@PluginParameter(description="Set num docs", optional=true)
-	public void setNumDocs(int n)
+	public void setNumDocs(long n)
 	{
 		System.out.println("setNumDocs: setting from " + numDocs
 		                   + " to " + n);
-	
 		numDocs = n;
 	}
     
