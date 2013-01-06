@@ -22,9 +22,10 @@ public class RegisterHandler implements HttpHandler
 
 	public void handle(HttpExchange exchange) throws IOException {
 		try{
+			String clientId = exchange.getRequestHeaders().get(Foo.CLIENT_ID_KEY).get(0);
 			String remoteHost = exchange.getRemoteAddress().getHostName();
 			
-			clients.add(remoteHost);
+			clients.add(makeCompleteClientKey(remoteHost, clientId));
 			System.out.println("RegisterHandler: " + remoteHost);
 			
 			exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
@@ -42,6 +43,11 @@ public class RegisterHandler implements HttpHandler
 	public Set<String>getClients()
 	{
 		return this.clients;
+	}
+
+	public String makeCompleteClientKey(String host, String id)
+	{
+		return host + "/" + id;
 	}
 	
 	

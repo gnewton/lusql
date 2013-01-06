@@ -36,7 +36,6 @@ public class HttpDocSink
 		
 	}
 
-	int chunkSize = 3;
 	HttpServer httpServer = null;
 	Set<String>clients = null;
 	
@@ -46,7 +45,6 @@ public class HttpDocSink
 		try{
 			queue = new ArrayBlockingQueue<Doc[]>(20);
 			
-			// http://alistairisrael.wordpress.com/2009/09/02/functional-http-testing-with-sun-java-6-httpserver/
 			InetSocketAddress address = new InetSocketAddress(PORT);
 			httpServer = HttpServer.create(address, 0);
 			
@@ -72,17 +70,15 @@ public class HttpDocSink
 		}
 	}
 		
-	long count = 0l;
-	
 
+	private long count = 0l;
+	
 	public void addDoc(Doc[] docList)  
 		throws DocSinkException
 	{
 		try{
-			System.out.println("add");
 			queue.put(docList);
 			count += (long)(docList.length);
-			
 		}
 		catch(Exception e){
 			e.printStackTrace();

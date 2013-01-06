@@ -8,7 +8,7 @@ package ca.gnewton.lusql.core;
  *
  *
  * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
- * @copyright CISTI / National Research Council Canada
+ * @copyright CISTI / National Research Council Canada and Glen Newton
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
  * 
@@ -1016,7 +1016,6 @@ public class LuSql
 					                   );
 				}
 	 
-
 		docSink.init(p);
 		return docSink;
 	}
@@ -1784,8 +1783,9 @@ public class LuSql
 				for(String f:fieldNames)
 					docSource.addField(f);
 			}
-
+		System.out.println("LuSql: init docSource");
 		docSource.init(makeDocSourceProperties());
+		System.out.println("LuSql: init docSource DONE");
 	}
 
 	MultiValueProp makeDocSourceProperties()

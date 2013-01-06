@@ -21,6 +21,8 @@ public class DataHandler extends RegisterHandler
 	public static final String STATUS_NO_DATA="LUSQL_STATUS_NO_DATA";
 	public static final String STATUS_END_DATA="LUSQL_STATUS_END_DATA";
 	
+	int sizeLimit = 2000000;
+		
 	private BlockingQueue<Doc[]> queue = null;	
 
 	public DataHandler(BlockingQueue<Doc[]> queue) {
@@ -31,16 +33,20 @@ public class DataHandler extends RegisterHandler
 	
 	private boolean isLast = false;
 	public void handle(HttpExchange exchange) throws IOException {
+		String clientId = exchange.getRequestHeaders().get(Foo.CLIENT_ID_KEY).get(0);
 		System.out.println("Start request");
 		try{
 			String remoteHost = exchange.getRemoteAddress().getHostName();
-			System.out.println("DataHandler: " + remoteHost);
-			if(!clients.contains(remoteHost)){
+			String completeClientKey = makeCompleteClientKey(remoteHost, clientId);
+			System.out.println("DataHandler: " + completeClientKey);
+
+
+			if(!clients.contains(completeClientKey)){
 				exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-				System.out.println("Remote host not in clients: " + remoteHost);
+				System.out.println("Remote host id not in clients: " + completeClientKey);
 			}
 			else{
-				System.out.println("Remote host ok: " + remoteHost);
+				System.out.println("Remote host id ok: " + completeClientKey);
 				
 				StringBuilder sb = new StringBuilder(1000);
 
@@ -48,8 +54,10 @@ public class DataHandler extends RegisterHandler
 				Doc[] docs = null;	
 				
 				boolean first = true;
+
+				int numDocLists = 0;
 				
-				while(sb.length() < 400000 && !isLast){
+				while(sb.length() < sizeLimit && !isLast){
 					try{
 						docs = queue.poll(100l, TimeUnit.MILLISECONDS);
 					}
@@ -57,6 +65,8 @@ public class DataHandler extends RegisterHandler
 						e.printStackTrace();
 					}
 					if(docs != null){
+						++numDocLists;
+						
 						if(first){
 							sb.append("[\n");
 							first = false;
@@ -81,15 +91,18 @@ public class DataHandler extends RegisterHandler
 
 				if(docs != null){
 					sb.append("]");
+
 					System.out.println("Sending " + sb.length());
-					System.out.println("Sending #docs:" + count);
-					System.out.println("Total #docs:" + totalCount);
+					System.out.println("Sending #docs: " + count);
+					System.out.println("Total #docs: " + totalCount);
+					System.out.println("Total #docsLists: " + numDocLists);
 					
 					//System.out.println(sb);
 					byte[] response = Compressor.compress((sb.toString()).getBytes("UTF-8"));
 					System.out.println("response length=" + response.length);
 					
 					Headers headers = exchange.getResponseHeaders();
+					
 					if(isLast){
 						headers.put(STATUS_KEY, makeList(STATUS_END_DATA));
 						System.out.println("SENDING ISLAST");

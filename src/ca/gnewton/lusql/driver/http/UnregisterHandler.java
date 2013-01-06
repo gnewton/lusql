@@ -19,9 +19,13 @@ public class UnregisterHandler extends RegisterHandler
 	public void handle(HttpExchange exchange) throws IOException {
 		try{
 			String remoteHost = exchange.getRemoteAddress().getHostName();
-			System.out.println("UnegisterHandler: " + remoteHost);
-			if(clients.contains(remoteHost)){
-				clients.remove(remoteHost);
+			String clientId = exchange.getRequestHeaders().get(Foo.CLIENT_ID_KEY).get(0);
+			
+			String completeClientKey = makeCompleteClientKey(remoteHost, clientId);
+			
+			System.out.println("UnegisterHandler: " + completeClientKey);
+			if(clients.contains(completeClientKey)){
+				clients.remove(completeClientKey);
 				exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
 			}else{
 				exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);

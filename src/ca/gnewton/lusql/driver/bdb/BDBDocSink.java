@@ -16,7 +16,7 @@ public class BDBDocSink
     @Override
     public String description()
 	{
-	    return "Sink that writes documents to Berkely DB";
+	    return "Sink that writes documents to Berkeley DB";
 	}
 
     public BDBDocSink()
@@ -107,26 +107,23 @@ public class BDBDocSink
 	{
 	    for(Doc doc: docList)
 		{
+			if(doc.isLast()){
+				break;
+			}
+			
 		    BDBDocWrapper w = new BDBDocWrapper();
 		    try
 			{
-			    //bda.pIdx.delete(key);
 			    try
 				{
-				    //doc.addField("glensValue", "glensValue");
-				    //System.out.println(doc);
-				    //System.err.println("\n\nBDBDocSink addDoc: " + getPrimaryKeyField());
-				    //System.err.println("\n\nBDBDocSink addDoc: " + doc);
-				    //System.err.println("\n\nBDBDocSink addDoc: " 
-				    //+ doc.getFieldValues(getPrimaryKeyField()).get(0) 
-				    //+ "\n");
-				    				    
-				    w.setId(doc.getFieldValues(getPrimaryKeyField()).get(0));
+					w.setId(doc.getFieldValues(getPrimaryKeyField()).get(0));
 				}
 			    catch(Throwable t)
 				{
 				    t.printStackTrace();
 				    System.err.println("\n>> Error in BDBDocSink. Did you set the primary key with \"-P\"?\n");
+				    System.out.println(doc);
+				    
 				    throw new DocSinkException();
 				}
 			    w.addDoc(doc);

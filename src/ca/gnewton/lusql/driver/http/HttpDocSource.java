@@ -16,8 +16,8 @@ public class HttpDocSource
 {
 	public static final String SourceUrlKey="sourceUrl";
 
-	private String baseUrl="http://localhost:8888";
-	//private String baseUrl="http://192.168.0.102:8888";
+	//private String baseUrl="http://localhost:8888";
+	private String baseUrl="http://192.168.0.101:8888";
 
 	private String registerUrl = baseUrl + HttpDocSink.PATH_REGISTER;
 	private String unregisterUrl = baseUrl + HttpDocSink.PATH_UNREGISTER;
@@ -87,10 +87,16 @@ public class HttpDocSource
 		
 	}
 	
-
+	boolean first = true;
+	
 	public Doc next()  throws DataSourceException
 	{
 		try{
+			if(first){
+				Thread.currentThread().sleep(500);
+				first = false;
+			}
+			
 			int pollCount = 0;
 			while(pollCount < 30){
 				if(!successfulRegister){
@@ -157,5 +163,11 @@ public class HttpDocSource
 	{
 		this.successfulRegister	= successfulRegister;
 	}
+
+	public void setBaseUrl(final String baseUrl)
+	{
+		this.baseUrl = baseUrl;
+	}
+	
 	
 }

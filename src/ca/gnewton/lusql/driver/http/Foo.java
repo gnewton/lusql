@@ -8,12 +8,14 @@ import java.io.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 import java.util.concurrent.BlockingQueue;
+import java.lang.Math;
 
 
 import java.net.*;
 
 public class Foo extends Thread
 {
+	public static final String CLIENT_ID_KEY="clientIdKey";
 	private BlockingQueue<Doc> queue;
 
 	private String registerUrl = null;
@@ -21,6 +23,8 @@ public class Foo extends Thread
 	private String dataUrl = null;
 
 	private HttpDocSource hds = null;
+
+	private String clientKey = null;
 		
 	public void init(final BlockingQueue<Doc> queue, final String registerUrl, final String unregisterUrl, final String dataUrl,
 	                 final HttpDocSource hds)
@@ -30,26 +34,32 @@ public class Foo extends Thread
 		this.unregisterUrl = unregisterUrl;
 		this.dataUrl = dataUrl;
 		this.hds = hds;
-		
+
+		Random r = new Random();
+		clientKey =  Long.toString(System.nanoTime()) 
+			+ "_" 
+			+ Long.toString(Math.abs(r.nextLong()));
+		try{
+			System.out.println("Foo:: registering " + registerUrl);
+			register(registerUrl);
+			System.out.println("Foo:: registered " + registerUrl);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			hds.setSuccessfulRegister(false);
+			return;
+		}
+		hds.setSuccessfulRegister(true);
 	}
+
 
 	public void run()
 	{
-
 		try{
-			try{
-				register(registerUrl);
-			}
-			catch(Exception e){
-				e.printStackTrace();
-				hds.setSuccessfulRegister(false);
-				return;
-			}
-			hds.setSuccessfulRegister(true);
-			
 			while(true){
-				if(queue.size() == 0){
+				//if(queue.size() == 0){
 				//if(queue.size() < 5){
+				if(queue.size() <= maxDocListSize/5){
 					try{
 						if(!populateQueue()){
 							Doc doc = new DocImp();
@@ -107,7 +117,8 @@ public class Foo extends Thread
 			
 		}
 	}
-	
+	int maxDocListSize = 0;
+
 	JSONParser parser=new JSONParser();
 	private boolean populateQueue()
 		throws DataSourceException
@@ -127,6 +138,10 @@ public class Foo extends Thread
 		
 		//Object obj=JSONValue.parse(s);
 		JSONArray array=(JSONArray)obj;
+		if(array.size() > maxDocListSize){
+			maxDocListSize = array.size();
+		}
+		
 		
 		for(int i=0; i<array.size(); i++){
 			JSONObject d=(JSONObject)array.get(i);
@@ -157,6 +172,9 @@ public class Foo extends Thread
 		try {			
 			url = new URL(urlString);
 			conn = (HttpURLConnection) url.openConnection();
+			conn.addRequestProperty(Foo.CLIENT_ID_KEY,  clientKey);
+			System.out.println("Sending header: " + Foo.CLIENT_ID_KEY + "=" +  clientKey);
+			
 			conn.setRequestMethod("GET");
 			int responseCode = conn.getResponseCode();
 
@@ -178,10 +196,6 @@ public class Foo extends Thread
 			e.printStackTrace();
 			throw new DataSourceException("Unable to read from url " + urlString);
 		}
-		finally{
-			
-		}
-		
 		return content.toString();
 	}
 
@@ -192,6 +206,7 @@ public class Foo extends Thread
 		try {			
 			url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.addRequestProperty(Foo.CLIENT_ID_KEY,  clientKey);
 			conn.setRequestMethod("GET");
 			int responseCode = conn.getResponseCode();
 			if(responseCode != HttpURLConnection.HTTP_OK)

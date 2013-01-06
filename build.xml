@@ -120,6 +120,18 @@
     />
 	</target>
 
+	<property name="test-script" location="test/scripts/test1.sh"/>
+	<property name="test-dir" location="test/scripts"/>
+	<target name="test">
+	  <exec dir="${test-dir}" executable="${test-script}" >
+	  </exec>
+	</target>
+
+	<target name="test-small">
+	  <exec dir="${test-dir}" executable="${test-script}">
+		<arg value="100"/>
+	  </exec>
+	</target>
 
 	<target name="clean"
         description="clean up" >
