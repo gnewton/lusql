@@ -137,18 +137,6 @@ public class TeeDocSink
 	}
 
 	@Override
-	public void setPrimaryKeyField(String f)
-	{
-	
-	}
-    
-	@Override
-	public void setRemoveOnDone(boolean b)
-	{
-	
-	}
-
-	@Override
 	public void done() throws PluginException
 	{
 		boolean hasException = false;

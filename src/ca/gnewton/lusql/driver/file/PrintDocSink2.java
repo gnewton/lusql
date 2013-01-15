@@ -203,14 +203,6 @@ public class PrintDocSink2
 	{
 
 	}
-    public void setRemoveOnDone(boolean b)
-	{
-
-	}
-    public void setPrimaryKeyField(String f)
-	{
-
-	}
 
     void extractProperties(Properties p)
 	{

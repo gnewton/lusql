@@ -1,22 +1,16 @@
 package ca.gnewton.lusql.core;
 
-/**
- * Describe class LuSql here.
- *
- *
- * Created: Mon Nov 26 16:30:11 2007
- *
- *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
+/*
  * @copyright CISTI / National Research Council Canada and Glen Newton
- * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
  * 
  */
 
-import ca.gnewton.lusql.metadata.*;
-import ca.gnewton.lusql.util.*;
-
+import ca.gnewton.lusql.util.Util;
+import ca.gnewton.lusql.util.AnnotationUtil;
+import ca.gnewton.lusql.util.LoadAvg;
+import ca.gnewton.lusql.util.MultiValueProp;
+import java.util.concurrent.atomic.AtomicLong;
 import java.io.*;
 
 import java.lang.annotation.*;
@@ -71,170 +65,79 @@ public class LuSql
 
 	public static boolean debug = false;
 
-	/**
-	 * Describe query here.
-	 */
 	private String query = null;
-
-	/**
-	 * Describe AnalyzerName here.
-	 */
 	private String AnalyzerName = DefaultAnalyzerClassName;
-
-	/**
-	 * Describe StopWordFileName here.
-	 */
 	private String StopWordFileName = null;
-
-	/**
-	 * Describe DBDriverName here.
-	 */
 	private String DBDriverName = DefaultJDBCDriverClassName;
-
-	/**
-	 * Describe DBUrl here.
-	 */
 	private String DBUrl = null;
 
 	private Map<String, LuceneFieldParameters> fieldIndexParameters2 = new HashMap<String, LuceneFieldParameters>();
 
-	/**
-	 * Describe transactionIsolation here.
-	 */
 	private int transactionIsolation = DefaultTransactionIsolation;
-
-
-	/**
-	 * Describe SinkLocationName here.
-	 */
 	private String SinkLocationName = DefaultSinkLocationName;
-
-	/**
-	 * Describe appendToLuceneIndex here.
-	 */
 	private boolean appendToLuceneIndex;
 
-	/**
-	 * Describe MySql here.
-	 */
 	private boolean MySql = true;
 
-	/**
-	 * Describe Test here.
-	 */
 	private boolean Test = false;
-
-	/**
-	 * Describe usingRecordFields here.
-	 */
 	private boolean usingRecordFields = false;
 
-	/**
-	 * Describe preIndexDocFilter here.
-	 */
+
 	private DocFilter preIndexDocFilter = null;
 
-	/**
-	 * Describe DocFilterName here.
-	 */
+
 	private List<String> docFilterNames = new ArrayList<String>();;
 
 
 	LuceneFieldParameters globalFieldIndexParameter = null;
-	/**
-	 * Describe maxLuceneDocs here.
-	 */
 	private long maxDocs = Long.MAX_VALUE;
 
-	/**
-	 * Describe indexCreate here.
-	 */
 	private boolean indexCreate = true;
 
-	/**
-	 * Describe chunkSize here.
-	 */
 	private int chunkSize = 0;
 
-	/**
-	 * Describe verbose here.
-	 */
+
 	public static boolean verbose;
 
-	/**
-	 * Describe threaded here.
-	 */
+
 	private boolean threaded = true;
 
-	/**
-	 * Describe RAMBufferSizeMB here.
-	 */
+
 	private double RAMBufferSizeMB = DefaultRAMBufferSizeMB;
 
-	/**
-	 * Describe properties here.
-	 */
+
 	private MultiValueProp properties;
 
-	/**
-	 * Describe propertiesFileName here.
-	 */
 	private String propertiesFileName;
 
-	/**
-	 * Describe args here.
-	 */
 	private String[] args;
 
-	/**
-	 * Describe numThreads here.
-	 */
 	private int numThreads = (int)((float)(Runtime.getRuntime().availableProcessors()) *2.5);
 
-	/**
-	 * Describe fatalError here.
-	 */
 	private boolean fatalError = false;
 
-	/**
-	 * Describe merge here.
-	 */
+
 	private boolean merge = true;
 
-	/**
-	 * Describe docSourceClassName here.
-	 */
+
 	private String docSourceClassName=DefaultDocSourceClassName;
 
-	/**
-	 * Describe docSinkClassName here.
-	 */
+
 	private String docSinkClassName=DefaultDocSinkClassName;
 
 
-	/**
-	 * Describe primaryKeyField here.
-	 */
+
 	private String primaryKeyField;
 
-	/**
-	 * Describe docSourceFile here.
-	 */
+
 	private String docSourceFile;
 
-	/**
-	 * Describe offset here.
-	 */
+
 	private int offset = LuSqlFields.OffsetDefault;
 
-	/**
-	 * Describe transactionLevel here.
-	 */
+
 	private int transactionLevel;
 
-	/**
-	 * Describe queueSize here.
-	 */
 	private int queueSize = -1;
 
 	/**
@@ -455,7 +358,7 @@ public class LuSql
 				if(verbose)
 					System.err.println(this.getClass().getName());
 
-				setDocSink(makeDocSink(getProperties()));		
+				setDocSink(makeDocSink(getSinkProperties()));		
 				AddDocument.setDocSink(getDocSink());
 				getDocSink().setPrimaryKeyField(getPrimaryKeyField());
 			}
@@ -528,6 +431,8 @@ public class LuSql
 		int count = 0;
 		int added = 0;
 		boolean done = false;
+		int docCount = 0;
+		int docChunksCount = 0;
 
 		Doc[] docs = new Doc[docPacketSize];
 		int n = 0;
@@ -548,13 +453,20 @@ public class LuSql
 				count++;
 				if(n >= docPacketSize)
 					{
+						docCount += docs.length;
+						
 						addDoc(docs);
+						++docChunksCount;
+						
 						docs = new Doc[docPacketSize];
 						n = 0;
 						feedbackOutput(count);
+						checkLoad();
 					}
 			}
 		// flush out the last
+		System.out.println("LuSql: flushing out the remainder: " + n);
+
 		Doc[] endDocs = new Doc[n+1];
 		for(int i=0; i<n; i++)
 			{
@@ -564,6 +476,10 @@ public class LuSql
 		lastDoc.setLast(true);
 		endDocs[n] = lastDoc;
 		addDoc(endDocs);
+		++docChunksCount;
+		docCount += endDocs.length;
+		System.out.println("LuSql: Total docs sent: " + docCount);
+		System.out.println("LuSql: Total chunks doc sent: " + docChunksCount);
 	}
      
 
@@ -575,7 +491,7 @@ public class LuSql
 		FieldMapFilter fmf = new FieldMapFilter();
 		fmf.setFieldMap(fieldMap);
 		fmf.setOnlyMap(isOnlyMap());
-		((LinkedList)docFilters).addFirst(fmf);
+		((LinkedList<DocFilter>)docFilters).addFirst(fmf);
 	    
 	}
 
@@ -642,18 +558,20 @@ public class LuSql
 	long t0 = System.currentTimeMillis();
 
 
-	void feedbackOutput(int count)
+	void feedbackOutput(final int count)
 	{
 	    
 		if(!verbose)
 			return;
-
-		if(outputChunk != 0)
+		
+		if(outputChunk != 0){
 			if(count%(outputChunk/10) == 0)
 				{
 					System.err.print(".");
 					//System.out.println(count + getSystemInfo());
 				}
+		}
+		
 		if(count%outputChunk == 0)
 			{
 				System.err.println(count + "    " + timeDelta() + "s"
@@ -663,105 +581,34 @@ public class LuSql
 				                     + System.currentTimeMillis()/1000
 				                     + getSystemInfo()*/
 				                   );
-		
 				t0 = System.currentTimeMillis();
-		
 			} 
 	}
+    
+	private volatile AtomicLong realCount = new AtomicLong(0);
 
-    
-    
-	int realCount = 0;
 	private final ReentrantLock lock = new ReentrantLock();
-
-	/**
-	 * Describe onlyMap here.
-	 */
 	private boolean onlyMap = false;
-
-	/**
-	 * Describe docSink here.
-	 */
 	private DocSink docSink;
-
-	/**
-	 * Describe sourceCompression here.
-	 */
 	private boolean sourceCompression = false;
-
-	/**
-	 * Describe sinkCompression here.
-	 */
 	private boolean sinkCompression = false;
-
-	/**
-	 * Describe sourceProperties here.
-	 */
 	private MultiValueProp sourceProperties;
-
-	/**
-	 * Describe sinkProperties here.
-	 */
 	private MultiValueProp sinkProperties;
-
-	/**
-	 * Describe docSource here.
-	 */
 	private DocSource docSource;
 
-	/**
-	 * Describe outputChunk here.
-	 */
 	private int outputChunk = DefaultChunkSize;
-
-	/**
-	 * Describe workPerThread here.
-	 */
 	private int workPerThread;
-
-	/**
-	 * Describe userid here.
-	 */
 	private String userid = null;
-
-	/**
-	 * Describe password here.
-	 */
 	private String password = null;
-
-	/**
-	 * Describe sinkWriteToStdout here.
-	 */
 	private boolean sinkWriteToStdout = false;
-
-	/**
-	 * Describe sinkReadFromStdin here.
-	 */
 	private boolean sinkReadFromStdin;
-
-	/**
-	 * Describe loadAverageLimit here.
-	 */
 	private float loadAverageLimit = 9999f;
-
-	/**
-	 * Describe fieldNames here.
-	 */
 	private Set<String> fieldNames = new HashSet<String>();
-
-	/**
-	 * Describe fieldMap here.
-	 */
 	private Map<String,String> fieldMap;
+
 	public void incrementRealCount()
 	{
-		lock.lock();  // block until condition holds
-		try {
-			realCount++;
-		} finally {
-			lock.unlock();
-		}
-
+		realCount.incrementAndGet();
 	}
 
 	void initFilter(DocSource docSource)
@@ -823,7 +670,7 @@ public class LuSql
 		ad.setDocs(docs);
 		if(docSink == null)
 			throw new NullPointerException("DocSink is null");
-		ad.setFilters(getDocFilters());
+		AddDocument.setFilters(getDocFilters());
 		ad.setLuSql(this);
 		//ca.gnewton.lusql.util.LoadInfo.loadAvgLimiter(loadAverageLimit, 30, true);
 		//System.err.print("*");
@@ -888,6 +735,21 @@ public class LuSql
 	}
 
 
+	
+
+	public static final DocSource instantiateDocSource(String sourceClassName)
+		throws PluginException
+	{
+		return (DocSource)(Util.instantiateClass(sourceClassName));
+	}
+
+	public static final DocSink instantiateDocSink(String sinkClassName)
+		throws PluginException
+	{
+		return (DocSink)(Util.instantiateClass(sinkClassName));
+	}
+	
+
 	DocSource makeDocSource()
 		throws ClassNotFoundException,
 		       NoSuchMethodException,
@@ -896,14 +758,9 @@ public class LuSql
 		       PluginException,
 		       java.lang.reflect.InvocationTargetException
 	{
-		Class<?> docSourceClass = Class.forName(getDocSourceClassName());
-		if(LuSql.verbose)
-			{
-				//cat.info("DocSource: " + getDocSourceClassName());
-			}
-		Annotation a = docSourceClass.getAnnotation(PluginParameter.class) ;
-		Constructor constructor = docSourceClass.getConstructor();
-		DocSource source = (DocSource)constructor.newInstance();
+		String className = getDocSourceClassName();
+		
+		DocSource source = instantiateDocSource(className);
 
 		Map<String, MultiValueProp> allPluginProps = new HashMap<String, MultiValueProp> ();
 		MultiValueProp mvp = new MultiValueProp();
@@ -911,70 +768,12 @@ public class LuSql
 		allPluginProps.put("ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource",
 		                   mvp);
 
-		for(java.lang.reflect.Method method : docSourceClass.getDeclaredMethods()) 
-			{
-				PluginParameter paramAnnot = method.getAnnotation(PluginParameter.class);
-				if(paramAnnot != null)
-					{
-						if(!PluginParameter.Validator.validMethod(method, paramAnnot.isList()))
-							if(!paramAnnot.isList())
-								throw new PluginException("Illegal method for annotation: "
-								                          + " Annotation: " 
-								                          + PluginParameter.class.getName()
-								                          + "; method: "
-								                          + getDocSourceClassName()
-								                          + "." 
-								                          + method.getName()
-								                          + "; only to be used on get'ters (\"getFoo\")."
-								                          );
-							else
-								throw new PluginException("Illegal method for annotation: "
-								                          + " Annotation: " 
-								                          + PluginParameter.class.getName()
-								                          + "; method: "
-								                          + getDocSourceClassName()
-								                          + "." 
-								                          + method.getName()
-								                          + "; only to be used on add'ers (\"addFoo\")."
-								                          );
-			    
-						System.out.println("Method=" + method);
-						System.out.println("MethodName=" + method.getName());
-						System.out.println("\t" + paramAnnot);
-						System.out.println("\t description: " + paramAnnot.description());
-						System.out.println("\t optional: " + paramAnnot.optional());
-						// fixxx xxx
-						/*
-						  if(allPluginProps.containsKey(getDocSourceClassName()))
-						  {
-						  MultiValueProp mvp = new 
-						  Object o = method.invoke(source, new Integer(100));
-			    
-						  System.out.println("\t\t" + o);
-						*/
-			    
-					}
-		    
-				/*
-				  HiddenCreoleParameter hiddenParamAnnot = method
-				  .getAnnotation(HiddenCreoleParameter.class);
-				  if(paramAnnot != null || hiddenParamAnnot != null) {
-				  if(!method.getName().startsWith("set") || method.getName().length() < 4
-				  || method.getParameterTypes().length != 1) {
-				  throw new GateException("Creole parameter annotation found on "
-				  + method
-				  + ", but only setter methods may have this annotation.");
-				*/
-			}
+		Class<? extends DocSource> docSourceClass = source.getClass();
 
-		//Annotation[] anns = docSourceClass.getAnnotation(a);
-		//for(Annotation an: anns)
-		{
-			//System.out.println("76567--------------- " + an);
-		    
-		}
-	    
-	    
+		//Annotation a = docSourceClass.getAnnotation(PluginParameter.class) ;
+
+		AnnotationUtil.handleAnnotations(docSourceClass);
+		
 
 		return source;
 	    
@@ -1022,7 +821,7 @@ public class LuSql
      
 
 
-	static DocSink makeDocSink(String thisSink, boolean isSinkWriteToStdout)
+	static DocSink makeDocSink(String sinkClassName, boolean isSinkWriteToStdout)
 		throws ClassNotFoundException,
 		       NoSuchMethodException,
 		       InstantiationException,
@@ -1030,14 +829,8 @@ public class LuSql
 		       java.lang.reflect.InvocationTargetException,
 		       PluginException
 	{
-		if(LuSql.verbose)
-			{
-				System.err.println("----------> DocSink: " + thisSink);
-			}
-
-		Class<?> docSinkClass = Class.forName(thisSink);
-		Constructor constructor = docSinkClass.getConstructor();
-		DocSink docSink = (DocSink)constructor.newInstance();
+		DocSink docSink = instantiateDocSink(sinkClassName);
+		Class<?> docSinkClass = docSink.getClass();
 
 		if(docSink.isSupportsWritingToStdout() && !isSinkWriteToStdout)
 			throw new PluginException("Sink does not support write to stdout");
@@ -1049,13 +842,6 @@ public class LuSql
 
 	}
 
-
-	boolean first = true;
-	void storeDoc(Doc d)
-	{
-		//if(first)
-
-	}
 
 	void initPools()
 	{
@@ -1103,7 +889,7 @@ public class LuSql
 					}
 				Class<?> filterClass = Class.forName(filterName);
 		
-				Constructor constructor = filterClass.getConstructor();
+				Constructor<? extends Object> constructor = filterClass.getConstructor();
 				newFilters.add((DocFilter)constructor.newInstance());
 			}
 		return newFilters;
@@ -1625,6 +1411,8 @@ public class LuSql
 		if((recordCount)%outputChunk== 0 && recordCount > 1)
 			{
 				System.out.println(" " + recordCount + " docs    " + (System.currentTimeMillis()-t0)/1000 + "s");
+				System.out.println(outputChunk);
+				
 				t0 = System.currentTimeMillis();
 			}
 		return t0;
@@ -1713,29 +1501,15 @@ public class LuSql
 		return primaryKeyField;
 	}
 
-	/**
-	 * Set the <code>PrimaryKeyField</code> value.
-	 *
-	 * @param newPrimaryKeyField The new PrimaryKeyField value.
-	 */
 	public final void setPrimaryKeyField(final String newPrimaryKeyField) {
 		this.primaryKeyField = newPrimaryKeyField;
 	}
 
-	/**
-	 * Get the <code>DocSourceFile</code> value.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	public final String getDocSourceFile() {
 		return docSourceFile;
 	}
 
-	/**
-	 * Set the <code>DocSourceFile</code> value.
-	 *
-	 * @param newDocSourceFile The new DocSourceFile value.
-	 */
+
 	public final void setDocSourceFile(final String newDocSourceFile) {
 		this.docSourceFile = newDocSourceFile;
 	}
@@ -1748,22 +1522,13 @@ public class LuSql
 			return globalFieldIndexParameter;
 	}
 
-	/**
-	 * Get the <code>GlobalFieldIndexParameter</code> value.
-	 *
-	 * @return a <code>LuceneFieldParameters</code> value
-	 */
 	public final LuceneFieldParameters getGlobalFieldIndexParameter() {
 		return globalFieldIndexParameter;
 	}
 
-	/**
-	 * Set the <code>GlobalFieldIndexParameter</code> value.
-	 *
-	 * @param newGlobalFieldIndexParameter The new GlobalFieldIndexParameter value.
-	 */
-	public final void setGlobalFieldIndexParameter(final LuceneFieldParameters newGlobalFieldIndexParameter) {
-		this.globalFieldIndexParameter = newGlobalFieldIndexParameter;
+
+	public final void setGlobalFieldIndexParameter(final LuceneFieldParameters globalFieldIndexParameter) {
+		this.globalFieldIndexParameter = globalFieldIndexParameter;
 	}
 
 	public void addGlobalField(LuceneFieldParameters para, String fieldName, String value)
@@ -2230,5 +1995,12 @@ public class LuSql
 	public final void setLoadAverageLimit(final float newLoadAverageLimit) {
 		this.loadAverageLimit = newLoadAverageLimit;
 	}
+
+	private void checkLoad()
+	{
+		LoadAvg.checkAvg(3.0);
+	}
+	
+
 }///////////////////////
 

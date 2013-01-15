@@ -19,7 +19,7 @@ public @interface PluginParameter
 		                                  boolean isList)
 		{
 			boolean foo = isList;
-		    
+			
 			if(!isList && method.getName().startsWith("set") 
 			   ||
 			   isList && method.getName().startsWith("add")

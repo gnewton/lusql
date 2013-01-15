@@ -12,6 +12,8 @@ package ca.gnewton.lusql.core;
 public class DataSourceException 
     extends Exception
 {
+	static final long serialVersionUID = 1166985225326060842L;
+
     public DataSourceException()
 	{
 	    super();

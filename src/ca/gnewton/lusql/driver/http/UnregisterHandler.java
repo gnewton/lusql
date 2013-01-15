@@ -16,6 +16,7 @@ public class UnregisterHandler extends RegisterHandler
 	public UnregisterHandler() {
 
 	}
+
 	public void handle(HttpExchange exchange) throws IOException {
 		try{
 			String remoteHost = exchange.getRemoteAddress().getHostName();

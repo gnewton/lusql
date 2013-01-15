@@ -11,15 +11,7 @@ import java.util.concurrent.locks.*;
 
 import ca.gnewton.lusql.util.*;
 import ca.gnewton.lusql.core.*;
-/**
- * Describe class LuceneIndex here.
- *
- *
- * Created: Mon Dec  1 16:09:02 2008
- *
- * @author <a href="mailto:gnewton@">Glen Newton</a>
- * @version 1.0
- */
+
 public class NullDocSink 
     extends AbstractDocSink
 {
@@ -83,10 +75,6 @@ public class NullDocSink
 	    return  null;
 	}
 
-    public void setPrimaryKeyField(final String newPrimaryKeyField) {
-
-    }
-
     public boolean isThreaded()
 	{
 	    return false;
@@ -94,10 +82,6 @@ public class NullDocSink
     public boolean isRemoveOnDone()
 	{
 	    return false;
-	}
-    public void setRemoveOnDone(boolean b)
-	{
-
 	}
 
     public String descriptor()

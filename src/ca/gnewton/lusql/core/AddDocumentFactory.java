@@ -30,10 +30,10 @@ public class AddDocumentFactory
 	++returned;
 	//if(returned%1000 == 0)
 	//System.err.println("AddDocumentFactory returned: " + returned);
-        AddDocument ad = (AddDocument)obj; 
+	AddDocument ad = (AddDocument)obj; 
 	ad.setDocs(null);
-	ad.setDocSink(null);
-	ad.setFilter(null);
+	AddDocument.setDocSink(null);
+	AddDocument.setFilter(null);
 	ad.setLuSql(null);
     } 
 }

@@ -13,19 +13,20 @@ import java.util.concurrent.BlockingQueue;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-
-
-
 public class HttpDocSink 
-	implements DocSink
+	extends AbstractDocSink
+	        //implements DocSink
 {
-	public static final String SinkURLKey="sinkUrl";
-	private BlockingQueue<Doc[]> queue = null;
+	public static final String SinkPortKey="port";
+	public static final String PATH_REGISTER="/register";
+	public static final String PATH_UNREGISTER="/unregister";
+	public static final String PATH_DATA="/data";
 
-	int PORT=8888;
-	static public String PATH_REGISTER="/register";
-	static public String PATH_UNREGISTER="/unregister";
-	static public String PATH_DATA="/data";
+	private volatile long count = 0l;
+	private volatile BlockingQueue<Doc[]> queue = null;
+
+	private int port=8888;
+	public long waitTimeMillisForClientUnregister = 30l * 1000l;
 	
 	public HttpDocSink() {
 
@@ -36,16 +37,21 @@ public class HttpDocSink
 		
 	}
 
-	HttpServer httpServer = null;
-	Set<String>clients = null;
+	private volatile HttpServer httpServer = null;
+	private volatile Set<String>clients = null;
 	
 	public void init(MultiValueProp p) 
 		throws PluginException
 	{
+		extractProperties(p);
+		setSupportsWritingToStdout(false);
+		setSupportsCompression(false);
+		setThreadSafe(true);
+		
 		try{
 			queue = new ArrayBlockingQueue<Doc[]>(20);
 			
-			InetSocketAddress address = new InetSocketAddress(PORT);
+			InetSocketAddress address = new InetSocketAddress(port);
 			httpServer = HttpServer.create(address, 0);
 			
 			clients = new HashSet<String>();
@@ -70,8 +76,6 @@ public class HttpDocSink
 		}
 	}
 		
-
-	private long count = 0l;
 	
 	public void addDoc(Doc[] docList)  
 		throws DocSinkException
@@ -88,7 +92,17 @@ public class HttpDocSink
 	public void done()  
 		throws PluginException
 	{
+		long startDoneTime = System.currentTimeMillis();
+		
 		while(true){
+			long timeNow = System.currentTimeMillis();
+			if(timeNow - startDoneTime > waitTimeMillisForClientUnregister)
+				{
+					System.out.println("Done: shutting down timeout expired: waiting: queue=" + queue.size()
+					                   + "  clients=" + clients.size());
+					break;
+				}
+					  
 			System.out.println("Done: waiting: queue=" + queue.size()
 			                   + "  clients=" + clients.size());
 			if(queue.size() == 0 && clients.size() == 0){
@@ -108,47 +122,22 @@ public class HttpDocSink
 		httpServer.stop(10);
 	}
 	
-	public Object internal()
-	{
-		return null;
-	}
-
-	public final boolean isSupportsCompression() {
-		return false;
-	}
-
-	public final void setPrimaryKeyField(final String newPrimaryKeyField) {
-		
-	}
-
-	public boolean isSupportsWritingToStdout()
-	{
-		return false;
-	}
-
-	public boolean isThreadSafe()
-	{
-		return true;
-	}
-
-	public final boolean isThreaded() {
-		return true;
-	}
-
-
 	public String description()
 	{
 		return "Sink that exposes documents via http rest interface";
 	}
+
+	public Object internal()  throws DocSinkException
+	{
+		return null;
+	}
+	
 
 	public boolean requiresPrimaryKeyField()
 	{
 		return false;
 	}
 
-	public final void setRemoveOnDone(final boolean newRemoveOnDone) {
-		
-	}
 
 	public boolean getWritingToStdout()
 	{
@@ -164,10 +153,6 @@ public class HttpDocSink
 		return false;
 	}
 
-	public void setThreadSafe(final boolean newThreadSafe)
-	{
-	
-	}
 
 	public final void setThreaded(final boolean newThreaded) {
 		
@@ -184,6 +169,12 @@ public class HttpDocSink
 		return p;
 	}
 	
+	private void extractProperties(MultiValueProp p)
+	{
+		if(p.containsKey(SinkPortKey)){
+			port=Integer.parseInt(p.get(SinkPortKey).get(0));
+		}
+	}
 			
 	
 

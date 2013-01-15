@@ -21,14 +21,17 @@ public class Foo extends Thread
 	private String registerUrl = null;
 	private String unregisterUrl = null;
 	private String dataUrl = null;
+	private int maxDocListSize = 0;
 
 	private HttpDocSource hds = null;
 
 	private String clientKey = null;
-		
+	private JSONParser parser=null;
+	
 	public void init(final BlockingQueue<Doc> queue, final String registerUrl, final String unregisterUrl, final String dataUrl,
 	                 final HttpDocSource hds)
 	{
+		parser=new JSONParser();
 		this.queue = queue;
 		this.registerUrl = registerUrl;
 		this.unregisterUrl = unregisterUrl;
@@ -57,9 +60,7 @@ public class Foo extends Thread
 	{
 		try{
 			while(true){
-				//if(queue.size() == 0){
-				//if(queue.size() < 5){
-				if(queue.size() <= maxDocListSize/5){
+				if(queue.size() <= maxDocListSize/4){
 					try{
 						if(!populateQueue()){
 							Doc doc = new DocImp();
@@ -117,9 +118,9 @@ public class Foo extends Thread
 			
 		}
 	}
-	int maxDocListSize = 0;
 
-	JSONParser parser=new JSONParser();
+
+
 	private boolean populateQueue()
 		throws DataSourceException
 	{
@@ -157,8 +158,6 @@ public class Foo extends Thread
 		}
 		return true;
 	}
-
-	
 
 	private String getUrlContent(String urlString) 
 		throws DataSourceException

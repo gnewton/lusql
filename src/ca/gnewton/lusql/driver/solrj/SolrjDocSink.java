@@ -181,16 +181,6 @@ public class SolrjDocSink
 	    }
 	}
 
-    public void setRemoveOnDone(boolean b)
-	{
-	    
-	}
-
-    public void setPrimaryKeyField(String f)
-	{
-
-	}
-
     public String descriptor()
 	{
 	    return this.getClass().getName(); 

@@ -63,10 +63,10 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            optimize="${compule.optimize}">
-		  <!--
-			<compilerarg value="-Xlint:all -nowarn"/>
 
-			<compilerarg value="-Xlint:unchecked -Xlint:deprecation"/>
+			
+			<!--
+				<compilerarg value="-Xlint:all"/>
 			-->
 		</javac>
 	</target>
@@ -124,6 +124,7 @@
 	<property name="test-dir" location="test/scripts"/>
 	<target name="test">
 	  <exec dir="${test-dir}" executable="${test-script}" >
+		<arg value="10009"/>
 	  </exec>
 	</target>
 
@@ -133,11 +134,23 @@
 	  </exec>
 	</target>
 
+	<target name="test-large">
+	  <exec dir="${test-dir}" executable="${test-script}">
+		<arg value="10000000"/>
+	  </exec>
+	</target>
+
+	<target name="test-huge">
+	  <exec dir="${test-dir}" executable="${test-script}">
+		<arg value="1000000000"/>
+	  </exec>
+	</target>
+
 	<target name="clean"
         description="clean up" >
 		<!-- Delete the ${build} and ${dist} directory trees -->
 		<delete dir="${build}"/>
-		<delete dir="${dist}"/>
+		<delete file="${dist}/lib/${lusql}"/>
 		<delete dir="${docs}"/>
 	</target>
 </project>

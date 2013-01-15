@@ -11,21 +11,24 @@ import java.util.concurrent.TimeUnit;
 import java.net.*;
 
 
-public class HttpDocSource 
-	implements DocSource
+public class HttpDocSource extends AbstractDocSource
+//implements DocSource
 {
 	public static final String SourceUrlKey="sourceUrl";
 
-	//private String baseUrl="http://localhost:8888";
-	private String baseUrl="http://192.168.0.101:8888";
+	private String baseUrl="http://localhost:8888";
+	//private String baseUrl="http://192.168.0.101:8888";
 
-	private String registerUrl = baseUrl + HttpDocSink.PATH_REGISTER;
-	private String unregisterUrl = baseUrl + HttpDocSink.PATH_UNREGISTER;
-	private String dataUrl = baseUrl + HttpDocSink.PATH_DATA;
+	private final String registerUrl = baseUrl + HttpDocSink.PATH_REGISTER;
+	private final String unregisterUrl = baseUrl + HttpDocSink.PATH_UNREGISTER;
+	private final String dataUrl = baseUrl + HttpDocSink.PATH_DATA;
+
+	private volatile boolean first = true;
+	private volatile BlockingQueue<Doc> queue;
+	private volatile boolean successfulRegister = false;
 
 	private Foo foo = null;
 	
-	BlockingQueue<Doc> queue;
 	
 	public void init(MultiValueProp p) throws PluginException
 	{
@@ -39,12 +42,11 @@ public class HttpDocSource
 			Thread.currentThread().sleep(3000);		
 		}
 		catch(Exception e){
-			
+			e.printStackTrace();
 		}
 
 	}
 	
-
 	public Properties explainProperties()
 	{
 		return null;
@@ -55,39 +57,11 @@ public class HttpDocSource
 		return null;
 	}
 	
-	public void done() throws PluginException
-	{
-		
-	}
-	
 
-	public String showState(int level) throws PluginException
+	public String showState(int level)
 	{
 		return null;	
 	}
-	
-	public boolean isThreaded()
-	{
-		return false;
-	}
-	
-	public void setThreaded(boolean b)
-	{
-		
-	}
-	
-
-	public boolean isThreadSafe()
-	{
-		return true;
-	}
-	
-	public void setThreadSafe(boolean b)
-	{
-		
-	}
-	
-	boolean first = true;
 	
 	public Doc next()  throws DataSourceException
 	{
@@ -123,41 +97,14 @@ public class HttpDocSource
 		throw new DataSourceException("Unable to get data from url");
 	}
 	
-	public void addField(String field)
-	{
-		
-	}
-	
-	public boolean supportsCompression()
-	{
-		return false;
-	}
-	
-
-	public boolean isSupportsReadingFromStdin()
-	{
-		return false;
-	}
-	
-	public void setReadingFromStdin(boolean b)
-	{
-		
-	}
-	
-	public boolean getReadingFromStdin()
-	{
-		return false;
-	}
-
-
-
-	///private
 	private void extractProperties(MultiValueProp p)
 	{
-		
+		if(p.containsKey(SourceUrlKey)){
+			setBaseUrl(p.get(SourceUrlKey).get(0));
+		}
 	}
 
-	boolean successfulRegister = false;
+
 
 	public void setSuccessfulRegister(final boolean successfulRegister)
 	{

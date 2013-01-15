@@ -31,8 +31,8 @@ public interface LuSqlFields
 
     public static final String LuSqlInfoSuffix = ".lusql.txt";
 
-    final public static int DefaultDocPacketSize = 16;    
-    static public int DefaultChunkSize = 10000;
+    final public static int DefaultDocPacketSize = 100;    
+    static public int DefaultChunkSize = 100000;
     static public int DefaultWorkPerThread = 10;
     static public int MinChunkSize = 333;
     static public int OffsetDefault = 0;

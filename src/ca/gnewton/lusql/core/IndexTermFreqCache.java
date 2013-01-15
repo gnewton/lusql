@@ -47,7 +47,7 @@ public class IndexTermFreqCache
 	    setPreload(newPreload);
 	    setReader(newReader);
 	    setFieldName(newFieldName);
-	    cache = new HashMap(initSize);
+	    cache = new HashMap<String, Integer>(initSize);
 	    if(preload)
 	    {
 		TermEnum te = reader.terms();

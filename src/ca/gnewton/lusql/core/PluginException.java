@@ -12,6 +12,8 @@ package ca.gnewton.lusql.core;
 public class PluginException 
     extends Exception
 {
+	static final long serialVersionUID = 8231166806262105392L;
+
     public PluginException()
 	{
 	    super();

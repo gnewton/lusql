@@ -25,6 +25,20 @@ public class LuceneDocSink
 		System.setProperty("org.apache.lucene.FSDirectory.class",NIOFSDirectory.class.getName());
 	}
 
+	private String primaryKeyField = null;
+	
+	public void setPrimaryKeyField(String primaryKeyField)
+	{
+		this.primaryKeyField = primaryKeyField;
+	}
+
+	private boolean removeOnDone = false;;
+	
+	public void setRemoveOnDone(boolean removeOnDone)
+	{
+		this.removeOnDone = removeOnDone;
+	}
+	
     
 	//static Category cat = Category.getInstance(LuSql.class.getName());
 	public boolean requiresPrimaryKeyField()
@@ -265,6 +279,10 @@ public class LuceneDocSink
 	void extractProperties(MultiValueProp p)
 	{
 		luceneExtractProperties(p);
+		if(p.containsKey(LuSqlFields.RemoveSinksOnDoneKey))
+			setRemoveOnDone(Boolean.parseBoolean(p.getProperty(LuSqlFields.RemoveSinksOnDoneKey).get(0)));
+		db("RemoveSinksOnDone", "" + isRemoveOnDone());
+
 	}
 
 	public String descriptor()

@@ -11,107 +11,93 @@ import java.util.*;
  * @version 1.0
  */
 abstract public class AbstractDocSource 
-    implements DocSource
+	implements DocSource
 {
 
-    /**
-     * Describe chunkHint here.
-     */
-    private int chunkHint = 10;
+	private int chunkHint = 10;
+	private boolean threaded = false;
+	boolean supportsCompression = false;
+	boolean threadSafe = false;
+	boolean supportsReadingFromStdin = false;
+	boolean readingFromStdin = false;
 
-    /**
-     * Describe threaded here.
-     */
-    private boolean threaded;
+	public AbstractDocSource() {
 
-    /**
-     * Creates a new <code>AbstractDocSource</code> instance.
-     *
-     */
-    public AbstractDocSource() {
-
-    }
-
-    boolean supportsCompression = false;
-    
-    public void setSupportsCompression(boolean newS)
-    {
-	supportsCompression = newS;
-    }
-    
-
-    public boolean supportsCompression()
-	{
-	    return false;
 	}
 
-    public String showState(int n)
-    {
-	StringBuilder sb = new StringBuilder();
-	sb.append(ca.gnewton.lusql.util.Util.offset("DocSource: " + this.getClass().getName(),n) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("supports compression: " + supportsCompression(),n+1) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("thread safe: " + isThreadSafe(),n+1) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("supports reading from stdin: " + isSupportsReadingFromStdin(), n+1) + "\n");
-	return sb.toString();
-    }
-
-    boolean threadSafe = false;
-    
-    public void setThreadSafe(final boolean newThreadSafe)
-    {
-	this.threadSafe = newThreadSafe;
-    }
-    
-
-    public boolean isThreadSafe()
+	public void setSupportsCompression(boolean supportsCompression)
 	{
-	    return threadSafe;
+		this.supportsCompression = supportsCompression;
 	}
-    public void addField(String field)
-    {
+    
+
+	public boolean supportsCompression()
+	{
+		return supportsCompression;
+	}
+
+	public String showState(int n)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(ca.gnewton.lusql.util.Util.offset("DocSource: " + this.getClass().getName(),n) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("supports compression: " + supportsCompression(),n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("thread safe: " + isThreadSafe(),n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("supports reading from stdin: " + isSupportsReadingFromStdin(), n+1) + "\n");
+		return sb.toString();
+	}
+
+
+    
+	public void setThreadSafe(final boolean newThreadSafe)
+	{
+		this.threadSafe = newThreadSafe;
+	}
+    
+
+	public boolean isThreadSafe()
+	{
+		return threadSafe;
+	}
+	public void addField(String field)
+	{
 	
-    }
+	}
 
-    boolean supportsReadingFromStdin = false;
-    
-    public void setSupportsReadingFromStdin(boolean b)
-    {
-	supportsReadingFromStdin=b;
-    }
+	public void setSupportsReadingFromStdin(boolean b)
+	{
+		supportsReadingFromStdin=b;
+	}
     
 
-    public boolean isSupportsReadingFromStdin()
-    {
-	return 	supportsReadingFromStdin;
-    }
+	public boolean isSupportsReadingFromStdin()
+	{
+		return 	supportsReadingFromStdin;
+	}
     
-    boolean readingFromStdin = false;
-    
-    public void setReadingFromStdin(boolean b)
-    {
-	readingFromStdin = b;
-    }
-    
-    public boolean getReadingFromStdin()
-    {
-	return readingFromStdin;
-    }
 
-    /**
-     * Get the <code>Threaded</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isThreaded() {
-	return threaded;
-    }
+    
+	public void setReadingFromStdin(boolean b)
+	{
+		readingFromStdin = b;
+	}
+    
+	public boolean getReadingFromStdin()
+	{
+		return readingFromStdin;
+	}
 
-    /**
-     * Set the <code>Threaded</code> value.
-     *
-     * @param newThreaded The new Threaded value.
-     */
-    public final void setThreaded(final boolean newThreaded) {
-	this.threaded = newThreaded;
-    }
+	public final boolean isThreaded() {
+		return threaded;
+	}
+
+	public final void setThreaded(final boolean newThreaded) {
+		this.threaded = newThreaded;
+	}
+
+	public void done() throws PluginException
+	{
+		
+	}
+	
+	
 }

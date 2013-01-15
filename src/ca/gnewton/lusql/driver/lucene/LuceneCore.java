@@ -78,16 +78,7 @@ abstract public class LuceneCore
 	 */
 	protected boolean removeOnDone=false;
 
-	/**
-	 * Describe primaryKeyField here.
-	 */
-	protected String primaryKeyField;
 
-
-	/**
-	 * Creates a new <code>LuceneCore</code> instance.
-	 *
-	 */
 	public LuceneCore() {
 
 	}
@@ -198,9 +189,6 @@ abstract public class LuceneCore
 			setSourceLocation(p.getProperty(LuSqlFields.SourceLocationKey).get(0));
 		db("SourceLocation", getSourceLocation());
 
-		if(p.containsKey(LuSqlFields.RemoveSinksOnDoneKey))
-			setRemoveOnDone(Boolean.parseBoolean(p.getProperty(LuSqlFields.RemoveSinksOnDoneKey).get(0)));
-		db("RemoveSinksOnDone", "" + isRemoveOnDone());
 
 		if(p.containsKey(LuSqlFields.AppendToSinkKey))
 			setAppendToSink(Boolean.parseBoolean(p.getProperty(LuSqlFields.AppendToSinkKey).get(0)));
@@ -304,18 +292,6 @@ abstract public class LuceneCore
 
 	public final boolean isRemoveOnDone() {
 		return removeOnDone;
-	}
-
-	public final void setRemoveOnDone(final boolean newRemoveOnDone) {
-		this.removeOnDone = newRemoveOnDone;
-	}
-
-	public final String getPrimaryKeyField() {
-		return primaryKeyField;
-	}
-
-	public final void setPrimaryKeyField(final String newPrimaryKeyField) {
-		this.primaryKeyField = newPrimaryKeyField;
 	}
 
 	public final String getQuery() {

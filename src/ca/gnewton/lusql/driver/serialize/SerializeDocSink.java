@@ -155,12 +155,6 @@ public class SerializeDocSink
 	    }
 	}
 
-    public void setRemoveOnDone(boolean b)
-	{
-
-	}
-
-    ////////////////
 
     void extractProperties(MultiValueProp  p)
 	{
@@ -176,10 +170,6 @@ public class SerializeDocSink
 	    return this.getClass().getName() + ": Directory: " + getIndexDirName();
 	}
 
-    public void setPrimaryKeyField(String f)
-	{
-
-	}
 
     /**
      * Get the <code>IndexDirName</code> value.

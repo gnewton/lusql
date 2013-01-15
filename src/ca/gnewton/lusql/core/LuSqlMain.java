@@ -23,7 +23,7 @@ import ca.gnewton.lusql.util.*;
 public class LuSqlMain
     implements LuceneFields, LuSqlFields, LocalAnnotation
 {
-	static Category cat = Category.getInstance(LuSql.class.getName());
+	//static Category cat = Category.getInstance(LuSql.class.getName());
     static
     {
 	    BasicConfigurator.configure();
@@ -81,10 +81,10 @@ public class LuSqlMain
 						Util.setOut(infoOut);
 
 						lusql.init();
-						if(lusql.isVerbose())
+						if(LuSql.isVerbose())
 							printOptions(lusql);			
 						lusql.run();
-						if(lusql.isVerbose())
+						if(LuSql.isVerbose())
 							System.err.println("*********** Elapsed time: " + (System.currentTimeMillis() - t0)/1000 + " seconds\n");
 						if(infoOut != null)
 							infoOut.close();
@@ -128,7 +128,7 @@ public class LuSqlMain
 	    Util.msg("Using Properties FileName:" + Util.delim(lusql.getPropertiesFileName()),false);
 	    Util.msg("Using Global field parameters: " + lusql.getGlobalFieldIndexParameter(), false);
 	    Map<String, LuceneFieldParameters>  paras = lusql.getFieldIndexParameters();
-	    if(paras != null && lusql.isVerbose())
+	    if(paras != null && LuSql.isVerbose())
 			{
 				Iterator<String> it = paras.keySet().iterator();
 				while(it.hasNext())
@@ -524,8 +524,12 @@ public class LuSqlMain
 	    if(line.hasOption(CLIDocSourceClassName))
 			lusql.setDocSourceClassName(line.getOptionValue(CLIDocSourceClassName));
 
-	    if(line.hasOption("P"))
-			lusql.setPrimaryKeyField(line.getOptionValue("P"));
+	    if(line.hasOption("P")){
+		    lusql.setPrimaryKeyField(line.getOptionValue("P"));
+		    System.out.println("----------- setting primary key field: " + lusql.getPrimaryKeyField());
+		    
+	    }
+	    
 
 	    if(line.hasOption(CLIDocSinkClassName))
 			{
@@ -596,7 +600,7 @@ public class LuSqlMain
 
 
 	    if(line.hasOption("v"))
-			lusql.setVerbose(true);
+			LuSql.setVerbose(true);
 
 	    if(line.hasOption("onlyMap"))
 			lusql.setOnlyMap(true);
@@ -676,7 +680,7 @@ public class LuSqlMain
 	    //////////////////////////
 	    options.addOption(OptionBuilder.hasArg()
 						  //.isRequired()
-						  .withDescription("JDBC connection URL: REQUIRED")
+						  .withDescription("JDBC connection URL: REQUIRED _OR_ Source location (Source dependent: file, url, etc)")
 						  .create("c"));
 
 	    //////////////////////////
@@ -930,7 +934,7 @@ public class LuSqlMain
 	    for(int i=0; i<explain.length; i++)
 			{
 				Class<?> docSourceClass = Class.forName(explain[i]);
-				Constructor constructor = docSourceClass.getConstructor();
+				Constructor<? extends Object> constructor = docSourceClass.getConstructor();
 				Plugin plugin = (Plugin)constructor.newInstance();
 				String pluginType = "Plugin";
 				if(plugin instanceof DocFilter)

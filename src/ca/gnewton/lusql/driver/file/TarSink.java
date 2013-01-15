@@ -47,11 +47,6 @@ public class TarSink
 	//static Category cat = Category.getInstance(LuSql.class.getName());
     private final ReentrantLock lock = new ReentrantLock();
 
-    @Override
-    public void setPrimaryKeyField(String s)
-    {
-	// OK
-    }
 
     @Override
     public boolean requiresPrimaryKeyField()
@@ -319,9 +314,6 @@ public class TarSink
 
 
 
-    public void setRemoveOnDone(final boolean newRemoveOnDone) {
-	
-    }
 
     public final boolean isRemoveOnDone() 
     {

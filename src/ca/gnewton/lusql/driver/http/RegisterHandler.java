@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RegisterHandler implements HttpHandler
 {
-	Set<String>clients;
+	volatile Set<String>clients;
 
 	public RegisterHandler() {
 		clients = new HashSet<String>();
@@ -30,6 +30,10 @@ public class RegisterHandler implements HttpHandler
 			
 			exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
 		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
 		finally{
 			exchange.close();
 		}

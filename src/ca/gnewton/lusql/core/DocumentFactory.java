@@ -33,8 +33,8 @@ public class DocumentFactory
 	//if(returned%1000 == 0)
 	//System.out.println("DocumentFactory returned: " + returned);
         Document doc = (Document)obj; 
-	List fields = doc.getFields();
-	Iterator it = fields.iterator();
+	List<Fieldable> fields = doc.getFields();
+	Iterator<Fieldable> it = fields.iterator();
 	while(it.hasNext())
 	{
 	    doc.removeField(((Field)it.next()).name());

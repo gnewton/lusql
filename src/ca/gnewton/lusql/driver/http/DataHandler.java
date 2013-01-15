@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DataHandler extends RegisterHandler
 {
@@ -23,15 +24,15 @@ public class DataHandler extends RegisterHandler
 	
 	int sizeLimit = 2000000;
 		
-	private BlockingQueue<Doc[]> queue = null;	
+	private volatile BlockingQueue<Doc[]> queue = null;	
+	private volatile AtomicLong totalCount = new AtomicLong(0);
+	private volatile boolean isLast = false;
+
 
 	public DataHandler(BlockingQueue<Doc[]> queue) {
 		this.queue = queue;
 	}
 
-	private long totalCount = 0l;
-	
-	private boolean isLast = false;
 	public void handle(HttpExchange exchange) throws IOException {
 		String clientId = exchange.getRequestHeaders().get(Foo.CLIENT_ID_KEY).get(0);
 		System.out.println("Start request");
@@ -87,7 +88,8 @@ public class DataHandler extends RegisterHandler
 						}
 					}
 				}
-				totalCount += count;
+				
+				totalCount.incrementAndGet();
 
 				if(docs != null){
 					sb.append("]");

@@ -65,7 +65,7 @@ abstract public class AbstractDocSink
      * @return a <code>boolean</code> value
      */
     public final boolean isSupportsWritingToStdout() {
-	return supportsWritingToStdout;
+	    return supportsWritingToStdout;
     }
 
     /**
@@ -74,7 +74,7 @@ abstract public class AbstractDocSink
      * @param newSupportsWritingToStdout The new SupportsWritingToStdout value.
      */
     public final void setSupportsWritingToStdout(final boolean newSupportsWritingToStdout) {
-	this.supportsWritingToStdout = newSupportsWritingToStdout;
+	    this.supportsWritingToStdout = newSupportsWritingToStdout;
     }
 
     boolean writingToStdout = false;
@@ -101,6 +101,44 @@ abstract public class AbstractDocSink
 	sb.append(ca.gnewton.lusql.util.Util.offset("requires primary key field: " + requiresPrimaryKeyField(), n+1) + "\n");
 	return sb.toString();
     }
-    
+
+	protected String primaryKeyField = null;
+	
+	public void setPrimaryKeyField(final String primaryKeyField)
+	{
+		System.out.println("*****************AbstractDocSink: " + primaryKeyField);
+		
+		this.primaryKeyField = primaryKeyField;
+	}
+
+	boolean removeOnDone = false;
+	
+	public void setRemoveOnDone(boolean removeOnDone)
+	{
+		this.removeOnDone = removeOnDone;
+	}
+
+	public void commit() throws DocSinkException
+	{
+
+	}
+	
+	public Object internal()  throws DocSinkException
+	{
+		return null;
+	}
+
+	public void done() throws PluginException
+	{
+		
+	}
+
+	public String description()
+	{
+		throw new NullPointerException("Class does not override description()");
+	}
+	
+	
+	
     
 }

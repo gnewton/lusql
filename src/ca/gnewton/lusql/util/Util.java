@@ -78,6 +78,45 @@ public class Util {
 			}		
 		return false;
 	}
-	
+
+	public static final Object instantiateClass(String className)
+		throws PluginException
+	{
+		Class<?> newClass = null;
+		try{
+			newClass = Class.forName(className);			
+		}
+		catch(ClassNotFoundException e){
+			e.printStackTrace();
+			throw new PluginException("Unable to find class: " + className);
+		}
+		
+		Constructor constructor = null;
+		try{
+			constructor = newClass.getConstructor();
+		}
+		catch(NoSuchMethodException nsm){
+			nsm.printStackTrace();
+			throw new PluginException("Unable to find empty constructor for class: " + className);
+		}
+		Object newInstance = null;
+		try{
+			newInstance = constructor.newInstance();
+		}
+		catch(InstantiationException ie){
+			ie.printStackTrace();
+			throw new PluginException("Unable to instantiate class: " + className);
+		}
+		catch(java.lang.reflect.InvocationTargetException ite){
+			ite.printStackTrace();
+			throw new PluginException("Unable to invoke constructor: class: " + className);
+		}
+		catch(IllegalAccessException iae){
+			iae.printStackTrace();
+			throw new PluginException("Unable to find access contructor: class: " + className);
+		}
+		return newInstance;
+	}
+
     
 }//

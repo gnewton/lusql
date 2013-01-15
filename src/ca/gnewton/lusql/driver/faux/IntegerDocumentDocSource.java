@@ -80,6 +80,7 @@ public class IntegerDocumentDocSource
 		++count;
 	
 		Doc doc = new DocImp();
+		
 		doc.addField(PrimaryKeyField, Long.toString(i));
 		doc.addField(SimpleIntField, Long.toString(i*7));
 		StringBuilder sb = new StringBuilder();

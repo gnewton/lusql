@@ -6,17 +6,9 @@ import java.util.*;
 import ca.gnewton.lusql.core.*;
 import ca.gnewton.lusql.util.*;
 
-/**
- * Describe class BDBDocSource here.
- *
- *
- * Created: Fri Dec 19 01:34:45 2008
- *
- * @author <a href="mailto:gnewton@">Glen Newton</a>
- * @version 1.0
- */
 public class BDBDocSource 
     extends AbstractDocSource
+	implements Gettable
 {
     public String description()
 	{
@@ -177,6 +169,17 @@ public class BDBDocSource
 	return sb.toString();
 	
     }
+
+	
+	public Doc get(String field, String key)
+		throws DataSourceException
+	{
+		if(core == null){
+			throw new DataSourceException("BDBCore is null");
+		}
+		return core.getDoc(key);
+	}
+	
 
 }//
 

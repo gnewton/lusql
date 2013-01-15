@@ -230,15 +230,6 @@ public class WriteFieldFilterOrSink
 	    return 10;
 	}
 
-    public void setPrimaryKeyField(String f)
-	{
-	    
-	}
-
-    public void setRemoveOnDone(boolean b)
-	{
-	    
-	}
     public void commit() throws DocSinkException
 	{
 

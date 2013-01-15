@@ -161,14 +161,14 @@ public class BDBCore
     
     public Doc getDoc(String k)
     {
-	return makeDoc(get(k));
+	    return makeDoc(get(k));
     }
     
     
     public BDBDocWrapper get(String key)
-	throws DatabaseException
+	    throws DatabaseException
 	{
-	    return map.get(key);
+		return map.get(key);
 	}
 
     public boolean containsKey(String key)
