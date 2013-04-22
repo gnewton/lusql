@@ -306,10 +306,19 @@ public class LuceneDocSource
 	public final void setThreaded(final boolean newThreaded) {
 		this.threaded = newThreaded;
 	}
-
-	public Doc get(String field, String key) throws DataSourceException
+	
+	// FIXXX
+	public Doc get(String field, String key) 
+		throws DataSourceException
 	{
-		return null;
+		throw new DataSourceException("Not implemented");
+	}
+
+	// FIXXX
+	public boolean containsKey(String field) 
+		throws DataSourceException
+	{
+		throw new DataSourceException("Not implemented");
 	}
 
 }

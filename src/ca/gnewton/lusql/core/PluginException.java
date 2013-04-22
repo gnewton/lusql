@@ -24,6 +24,11 @@ public class PluginException
 	    super(s);
 	}
 
+    public PluginException(Exception e)
+	{
+	    super(e);
+	}
+
 
 
 

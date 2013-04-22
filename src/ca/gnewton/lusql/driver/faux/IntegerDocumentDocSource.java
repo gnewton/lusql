@@ -38,20 +38,10 @@ public class IntegerDocumentDocSource
 
 	}
 
-	/**
-	 * Describe <code>explainProperties</code> method here.
-	 *
-	 * @return a <code>Map</code> value
-	 */
 	public final Properties explainProperties() {
 		return null;
 	}
 
-	/**
-	 * Describe <code>done</code> method here.
-	 *
-	 * @exception PluginException if an error occurs
-	 */
 	public final void done() throws PluginException {
 
 	}

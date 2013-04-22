@@ -36,7 +36,7 @@ public class LoadAvg
 				{
 					System.err.print("*");			
 					try{
-						Thread.currentThread().sleep((int)(300+ count*loadAvg*50));
+						Thread.currentThread().sleep((int)(300+ count*loadAvg*loadAvg*50));
 					}
 					catch(Exception e){
 						e.printStackTrace();
@@ -45,7 +45,7 @@ public class LoadAvg
 
 			++count;
 
-			if(random.nextInt(50) < count){
+			if(random.nextInt(1000) < (count*count)/(loadAvg*loadAvg)){
 				System.err.println("+");
 				break;
 			}

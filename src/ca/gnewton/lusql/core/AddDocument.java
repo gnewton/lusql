@@ -36,14 +36,13 @@ public class AddDocument implements Runnable
 	@Override
 	public final void run() 
 	{
-		
 		if(docSink == null)
 			System.err.println("AddDocument: DocSink is null!!!!!!  9898");
 
 		if(docs == null || getLuSql().isFatalError())
 			return;
 
-		LoadAvg.checkAvg(2.5);
+		LoadAvg.checkAvg(LuSql.loadAverageLimit + 0.25);
 		Doc doc = null;
 		
 		for(int i=0; i<docs.length; i++)
@@ -53,7 +52,6 @@ public class AddDocument implements Runnable
 					{
 						continue;
 					}
-				//System.err.println("AddDocument " + i + " " + doc.getFieldValues("i").get(0));
 				try
 					{	
 						doc = runSubQueryFilters(doc);
@@ -82,7 +80,6 @@ public class AddDocument implements Runnable
 				docs[i] = doc;
 			}
 	    
-	    
 		try
 			{
 				if(docSink == null)
@@ -105,8 +102,6 @@ public class AddDocument implements Runnable
 						if(notThreadSafeSink)
 							lock.unlock();
 					}
-		    
-		   
 				count.incrementAndGet();
 			}
 		catch(Throwable t)

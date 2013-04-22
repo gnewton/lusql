@@ -26,7 +26,4 @@ public interface DocSink
     public void setRemoveOnDone(boolean b);
     public void setPrimaryKeyField(String f);
     public boolean requiresPrimaryKeyField();
-    //public int getAddDocSizeHint();    // 2010 08 07
-    //public void setCommitFrequency(long n);    // 2009 09 18
-    //public void setChunkSize(int n);           // 2009 09 18
 }

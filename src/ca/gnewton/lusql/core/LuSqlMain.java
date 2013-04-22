@@ -64,6 +64,8 @@ public class LuSqlMain
      */
     public static final void main(final String[] args) 
 	{
+		checkForSpecialArguments(args);
+		
 	    long t0 = System.currentTimeMillis();
 	    LuSql lusql = new LuSql();
 	    lusql.setFieldMap(fieldMap);
@@ -101,9 +103,11 @@ public class LuSqlMain
 			}
 	    catch(Throwable pe)
 			{
-				pe.printStackTrace();
-				usage();
-				return;
+				if(!silent){
+					pe.printStackTrace();
+					usage();
+				}
+				System.exit(42);
 			}
 	}
 
@@ -452,6 +456,12 @@ public class LuSqlMain
 	    if(line.hasOption("V"))
 			lusql.setLoadAverageLimit((Float.parseFloat(line.getOptionValue("V"))));
 
+	    if(line.hasOption("X")){
+		    printArgs(args);
+	    }
+	    
+	    
+
 	    //REQUIRED
 	    if(line.hasOption("c"))
 			{
@@ -529,15 +539,11 @@ public class LuSqlMain
 		    System.out.println("----------- setting primary key field: " + lusql.getPrimaryKeyField());
 		    
 	    }
-	    
 
 	    if(line.hasOption(CLIDocSinkClassName))
 			{
 				lusql.setDocSinkClassName(line.getOptionValue(CLIDocSinkClassName));
 			}
-	    
-		    
-
 
 	    String[] sind = line.getOptionValues("L");
 	    if(sind != null)
@@ -668,11 +674,15 @@ public class LuSqlMain
 						  .create("S"));
 
 	    options.addOption(OptionBuilder.hasArg()
-						  .withDescription("On Linux machines, tries to limit activity to keep load average below this value. Default: infinite")
+	                      .withDescription("Tries to limit activity to keep load average below this (float) value. Can reduce performance. Default: " + LuSql.loadAverageLimit)
 						  .create("V"));
 
-
 	    options.addOption("J", false, "For multiple indexes (see -L) do not merge. Default: false");
+
+	    options.addOption("X", false, "Print out command line arguments");
+
+	    options.addOption("Y", false, "Silent output");
+	    	    
 
 	    options.addOption("o", false, "If supported, have DocSink write to stdout");
 
@@ -793,8 +803,10 @@ public class LuSqlMain
 
 	    //////////////////////
 	    options.addOption("N", true, 
-						  "Number of thread for multithreading. Defaults: Runtime.getRuntime().availableProcessors()) *2.5. For this machine this is: " 
-						  + (Runtime.getRuntime().availableProcessors() *2.5)
+						  "Number of thread for multithreading. Defaults: Runtime.getRuntime().availableProcessors()) *"
+	                      + LuSql.ThreadFactor
+	                      + ". For this machine this is: " 
+						  + (Runtime.getRuntime().availableProcessors() * LuSql.ThreadFactor)
 						  );
 
 	    //////////////////////
@@ -999,4 +1011,41 @@ public class LuSqlMain
     static public final void setExplainPlugins(final String[] newExplainPlugins) {
 		explainPlugins = newExplainPlugins;
     }
+
+	static void printArgs(String[] args)
+	{
+		if (argumentsPrinted)
+			return;
+		
+		StringBuilder sb = new StringBuilder();
+		for(String arg: args){
+			sb.append(arg + " ");
+		}
+
+		System.err.println("\n\n\n\n\n");
+		
+		System.err.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		System.err.println(sb);
+		System.err.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		
+	}
+	
+	static boolean argumentsPrinted = false;
+	static boolean silent = false;
+	
+	static void checkForSpecialArguments(final String[]args)
+	{
+		for(String arg: args){
+			if(arg.equals("-X")){
+				printArgs(args);
+			}
+
+			if(arg.equals("-Y")){
+				silent = true;
+			}
+			
+		}
+		argumentsPrinted = true;
+	}
+	
 }

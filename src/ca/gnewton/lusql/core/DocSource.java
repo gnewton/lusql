@@ -1,15 +1,7 @@
 package ca.gnewton.lusql.core;
 import java.util.*;
 
-/**
- * Describe interface DataSource here.
- *
- *
- * Created: Wed Dec  3 23:30:44 2008
- *
- * @author <a href="mailto:gnewton@">Glen Newton</a>
- * @version 1.0
- */
+
 public interface DocSource 
     extends Plugin
 {

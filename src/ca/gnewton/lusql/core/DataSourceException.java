@@ -24,4 +24,9 @@ public class DataSourceException
 	    super(s);
 	}
 
+    public DataSourceException(Exception e)
+	{
+	    super(e);
+	}
+
 }

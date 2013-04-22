@@ -3,6 +3,7 @@ package ca.gnewton.lusql.driver.sourcecheck;
 import ca.gnewton.lusql.core.AbstractDocSink;
 import ca.gnewton.lusql.core.AbstractDocSource;
 import ca.gnewton.lusql.core.Doc;
+import ca.gnewton.lusql.core.DocImpLast;
 import ca.gnewton.lusql.core.DocSource;
 import ca.gnewton.lusql.core.LuSql;
 import ca.gnewton.lusql.core.Gettable; 
@@ -63,6 +64,7 @@ public class DocSourceCheckSink
 				count.incrementAndGet();
 			}else{
 				encounteredLast = true;
+				numDocs = ((DocImpLast)doc).totalCount;
 			}
 			if(count.get() > numDocs){
 				throw new DocSinkException("Count is greater than expected num docs: " 

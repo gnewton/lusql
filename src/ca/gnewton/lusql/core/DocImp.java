@@ -17,7 +17,7 @@ public class DocImp
 	implements Doc, Serializable
 {
 	static final long serialVersionUID = -3985133040140585885L;
-
+	
 	Map<String, List<String>> fields = null;
 	Map<String, List<Reader>> readerFields = null;
 	Map<String, File> fileFields = null;

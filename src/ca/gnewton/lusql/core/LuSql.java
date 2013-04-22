@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.*;
+import java.io.InputStreamReader;
 
 import javax.sql.DataSource;
 
@@ -42,6 +43,11 @@ import org.apache.lucene.util.*;
 public class LuSql
 	implements LuceneFields, LuSqlFields
 {
+	public static final double ThreadFactor = 1.5;
+	public static float loadAverageLimit = 7.0f;
+
+	private InputStream inputStream = null;
+	
 	int docPacketSize = DefaultDocPacketSize;    
      
 	public static LuceneFieldParameters defaultLuceneFieldParameters;
@@ -112,7 +118,7 @@ public class LuSql
 
 	private String[] args;
 
-	private int numThreads = (int)((float)(Runtime.getRuntime().availableProcessors()) *2.5);
+	private int numThreads = (int)((float)(Runtime.getRuntime().availableProcessors()) *ThreadFactor);
 
 	private boolean fatalError = false;
 
@@ -121,29 +127,14 @@ public class LuSql
 
 
 	private String docSourceClassName=DefaultDocSourceClassName;
-
-
 	private String docSinkClassName=DefaultDocSinkClassName;
-
-
-
-	private String primaryKeyField;
-
-
-	private String docSourceFile;
-
-
 	private int offset = LuSqlFields.OffsetDefault;
 
-
+	private String primaryKeyField;
+	private String docSourceFile;
 	private int transactionLevel;
-
 	private int queueSize = -1;
 
-	/**
-	 * Creates a new <code>LuSql</code> instance.
-	 *
-	 */
 	public LuSql() 
 	{
 		subQueries = new ArrayList<SubQuery>(1);
@@ -467,17 +458,35 @@ public class LuSql
 		// flush out the last
 		System.out.println("LuSql: flushing out the remainder: " + n);
 
-		Doc[] endDocs = new Doc[n+1];
+		Doc[] endDocs = new Doc[n];
 		for(int i=0; i<n; i++)
 			{
 				endDocs[i] = docs[i];
 			}
-		Doc lastDoc = new DocImp();
-		lastDoc.setLast(true);
-		endDocs[n] = lastDoc;
 		addDoc(endDocs);
 		++docChunksCount;
 		docCount += endDocs.length;
+
+		while(threadPoolExecutor.getQueue().size() > 0 && threadPoolExecutor.getActiveCount() > 0){
+			try{
+				Thread.currentThread().sleep(500);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			System.out.print("@");
+		}
+	
+		endDocs = new Doc[1];
+		Doc lastDoc = new DocImpLast();
+		lastDoc.setLast(true);
+		((DocImpLast)lastDoc).totalCount = docCount;
+		
+		endDocs[0] = lastDoc;
+		addDoc(endDocs);
+		++docChunksCount;
+
 		System.out.println("LuSql: Total docs sent: " + docCount);
 		System.out.println("LuSql: Total chunks doc sent: " + docChunksCount);
 	}
@@ -602,7 +611,7 @@ public class LuSql
 	private String password = null;
 	private boolean sinkWriteToStdout = false;
 	private boolean sinkReadFromStdin;
-	private float loadAverageLimit = 9999f;
+
 	private Set<String> fieldNames = new HashSet<String>();
 	private Map<String,String> fieldMap;
 
@@ -676,22 +685,6 @@ public class LuSql
 		//System.err.print("*");
 	    
 		threadPoolExecutor.execute(ad);
-
-		/*
-		  docList.add(doc);
-		  if(docList.size() >= workPerThread)
-		  {
-		  AddDocument ad = new AddDocument();
-		  ad.setDocList(docList);
-		  if(docSink == null)
-		  throw new NullPointerException("DocSink is null");
-		  ad.setFilters(getDocFilters());
-		  ad.setLuSql(this);
-		  threadPoolExecutor.execute(ad);
-		  docList = new ArrayList<Doc>(workPerThread);
-		  ad = new AddDocument();
-		  ad.setDocSink(sink);
-		*/
 	}
      
 
@@ -1951,56 +1944,30 @@ public class LuSql
 		return docPacketSize;
 	}
 
-	/**
-	 * Set the <code>DocPacketSize</code> value.
-	 *
-	 * @param newDocPacketSize The new DocPacketSize value.
-	 */
 	public final void setDocPacketSize(final int newDocPacketSize) {
 		docPacketSize = newDocPacketSize;
 	}
 
-	/**
-	 * Get the <code>SinkReadFromStdin</code> value.
-	 *
-	 * @return a <code>boolean</code> value
-	 */
 	public final boolean isSinkReadFromStdin() {
 		return sinkReadFromStdin;
 	}
 
-	/**
-	 * Set the <code>SinkReadFromStdin</code> value.
-	 *
-	 * @param newSinkReadFromStdin The new SinkReadFromStdin value.
-	 */
 	public final void setSinkReadFromStdin(final boolean newSinkReadFromStdin) {
 		this.sinkReadFromStdin = newSinkReadFromStdin;
 	}
 
-	/**
-	 * Get the <code>LoadAverageLimit</code> value.
-	 *
-	 * @return a <code>float</code> value
-	 */
 	public final float getLoadAverageLimit() {
 		return loadAverageLimit;
 	}
 
-	/**
-	 * Set the <code>LoadAverageLimit</code> value.
-	 *
-	 * @param newLoadAverageLimit The new LoadAverageLimit value.
-	 */
 	public final void setLoadAverageLimit(final float newLoadAverageLimit) {
 		this.loadAverageLimit = newLoadAverageLimit;
 	}
 
 	private void checkLoad()
 	{
-		LoadAvg.checkAvg(3.0);
+		LoadAvg.checkAvg(loadAverageLimit);
 	}
-	
 
 }///////////////////////
 

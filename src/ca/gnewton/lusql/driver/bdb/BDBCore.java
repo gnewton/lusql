@@ -42,7 +42,7 @@ public class BDBCore
 
     // fixxx :: should be settable
     // BDB log files default to 50m
-    long logFileMax = 1024l * 1024l * 50l;
+    long logFileMax = 1024l * 1024l * 100l;
     // fixxx :: should be settable
     int cleanerLookAheadCacheSize = 32 * 1024;
  
@@ -50,7 +50,7 @@ public class BDBCore
     //throws DatabaseException
 	{
 	    if(dbDirName== null)
-		System.err.println("BDBCore Dir is null");
+		    System.err.println("BDBCore Dir is null");
 	    
 	    setReadOnly(newReadOnly);
 	    envConfig = new EnvironmentConfig();
@@ -172,7 +172,7 @@ public class BDBCore
 	}
 
     public boolean containsKey(String key)
-	throws DatabaseException
+	    throws DatabaseException
 	{
 	    return map.containsKey(key);
 	}

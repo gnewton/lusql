@@ -16,8 +16,8 @@ import org.apache.lucene.store.*;
 import org.apache.lucene.util.Version;
 
 public class LuceneDocSink 
-	extends LuceneCore
-	implements DocSink
+	extends AbstractDocSink
+	implements DocSink, ReaderFieldDocSink
 {
 	final static String compoundFormatKey = "compoundFormat";
 	static
@@ -26,6 +26,19 @@ public class LuceneDocSink
 	}
 
 	private String primaryKeyField = null;
+	static private LuceneCore luceneCore;
+	
+	static
+	{
+		initLucenCore();
+	}
+
+	static void initLucenCore()
+	{
+		luceneCore = new LuceneCore();
+	}
+	
+	
 	
 	public void setPrimaryKeyField(String primaryKeyField)
 	{
@@ -88,10 +101,10 @@ public class LuceneDocSink
 				if(p.containsKey(LuceneDocSink.compoundFormatKey))
 					setCompoundFormat(Boolean.parseBoolean(p.getProperty(LuceneDocSink.compoundFormatKey).get(0)));
 		
-				Analyzer ana = newAnalyzer();
+				Analyzer ana = luceneCore.newAnalyzer();
 				if(ana == null)
 					throw new PluginException("Problem with Analyzer: null;  Should be: "
-					                          + getAnalyzerName());
+					                          + luceneCore.getAnalyzerName());
 
 				/*
 				  writer = new IndexWriter(makeDirectory(),
@@ -101,7 +114,7 @@ public class LuceneDocSink
 				  // fixxx 2010.07.08
 				  );
 				*/
-				IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, ana).setRAMBufferSizeMB(getRAMBufferSize());
+				IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, ana).setRAMBufferSizeMB(luceneCore.getRAMBufferSize());
 		
 		
 				writer = new IndexWriter(makeDirectory(), config);
@@ -127,7 +140,7 @@ public class LuceneDocSink
 		exts.add("frq");
 		exts.add("nrm");
 	
-		return FSDirectory.open(new File(getLuceneIndexName()));
+		return FSDirectory.open(new File(luceneCore.getLuceneIndexName()));
 
 		/* FIXXX
 		   return new FileSwitchDirectory(exts,
@@ -166,7 +179,7 @@ public class LuceneDocSink
 		    
 				catch(Throwable t)
 					{
-						System.err.println("Exception on " + getLuceneIndexName());
+						System.err.println("Exception on " + luceneCore.getLuceneIndexName());
 						t.printStackTrace();
 						throw new DocSinkException("Failed addDocument");
 					}
@@ -195,7 +208,7 @@ public class LuceneDocSink
 		if(isRemoveOnDone())
 			{
 				//cat.info("Removing Lucene index directory: " + getLuceneIndexName());
-				ca.gnewton.lusql.core.Util.removeDir(getLuceneIndexName());
+				ca.gnewton.lusql.core.Util.removeDir(luceneCore.getLuceneIndexName());
 			}
 	}
 
@@ -279,19 +292,19 @@ public class LuceneDocSink
 	void extractProperties(MultiValueProp p)
 	{
 		luceneExtractProperties(p);
-		if(p.containsKey(LuSqlFields.RemoveSinksOnDoneKey))
+		if(p.containsKey(LuSqlFields.RemoveSinksOnDoneKey)){
 			setRemoveOnDone(Boolean.parseBoolean(p.getProperty(LuSqlFields.RemoveSinksOnDoneKey).get(0)));
-		db("RemoveSinksOnDone", "" + isRemoveOnDone());
-
+		}
+		
 	}
 
 	public String descriptor()
 	{
 		return this.getClass().getName() 
 			+ (
-			   (getLuceneIndexName()==null)
+			   (luceneCore.getLuceneIndexName()==null)
 			   ?""
-			   :("Writing to location: " + getLuceneIndexName())
+			   :("Writing to location: " + luceneCore.getLuceneIndexName())
 			   )
 			;
 	} 
@@ -302,11 +315,6 @@ public class LuceneDocSink
 
 	public final void setSupportsCompression(final boolean newSupportsCompression) {
 		this.supportsCompression = newSupportsCompression;
-	}
-
-	public boolean isSupportsWritingToStdout()
-	{
-		return false;
 	}
 
 	public void setWritingToStdout(boolean b)
@@ -330,7 +338,7 @@ public class LuceneDocSink
 
 	void luceneExtractProperties(MultiValueProp p)
 	{
-		super.luceneExtractProperties(p);
+		luceneCore.luceneExtractProperties(p);
 	
 		if(p.containsKey(compoundFormatKey))
 			setCompoundFormat(Boolean.getBoolean(p.getProperty(compoundFormatKey).get(0)));
@@ -341,16 +349,16 @@ public class LuceneDocSink
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(ca.gnewton.lusql.util.Util.offset("DocSink: " + this.getClass().getName(),n) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("RAM buffer size: " + getRAMBufferSize(), n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("analyzer: " + getAnalyzerName(), n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("append to existing Lucene index? " + getAppendToSink(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("RAM buffer size: " + luceneCore.getRAMBufferSize(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("analyzer: " + luceneCore.getAnalyzerName(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("append to existing Lucene index? " + luceneCore.getAppendToSink(), n+1) + "\n");
 		sb.append(ca.gnewton.lusql.util.Util.offset("compound format: " + getCompoundFormat(), n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("create index? " + isIndexCreate(), n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("index dir name: " + getLuceneIndexName(), n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("is threaded: " + isThreaded(),n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("remove on done: " + isRemoveOnDone(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("create index? " + luceneCore.isIndexCreate(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("index dir name: " + luceneCore.getLuceneIndexName(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("is threaded: " + luceneCore.isThreaded(),n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("remove on done: " + luceneCore.isRemoveOnDone(), n+1) + "\n");
 		sb.append(ca.gnewton.lusql.util.Util.offset("requires primary key field: " + requiresPrimaryKeyField(), n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("stop word file: " + getStopWordFileName(), n+1) + "\n");
+		sb.append(ca.gnewton.lusql.util.Util.offset("stop word file: " + luceneCore.getStopWordFileName(), n+1) + "\n");
 		sb.append(ca.gnewton.lusql.util.Util.offset("supports compression: " + isSupportsCompression(), n+1) + "\n");
 		sb.append(ca.gnewton.lusql.util.Util.offset("supports writing to stdout: " + isSupportsWritingToStdout(), n+1) + "\n");
 		return sb.toString();

@@ -15,16 +15,7 @@ import org.apache.lucene.store.*;
 import org.apache.lucene.util.Version;
 
 
-/**
- * Describe class LuceneCore here.
- *
- *
- * Created: Tue Dec 23 15:45:17 2008
- *
- * @author <a href="mailto:gnewton@">Glen Newton</a>
- * @version 1.0
- */
-abstract public class LuceneCore 
+public class LuceneCore 
 {
 	public static final String DEFAULT_ANALYZER="org.apache.lucene.analysis.standard.StandardAnalyzer";
 	
@@ -68,11 +59,6 @@ abstract public class LuceneCore
 	 */
 	protected String stopWordFileName;
 
-	/**
-	 * Describe optimizeOnClose here.
-	 */
-	protected boolean optimizeOnClose=true;
- 
 	/**
 	 * Describe removeOnDone here.
 	 */
@@ -129,11 +115,6 @@ abstract public class LuceneCore
 		return analyzerName;
 	}
 
-	/**
-	 * Set the <code>AnalyzerName</code> value.
-	 *
-	 * @param newAnalyzerName The new AnalyzerName value.
-	 */
 	public final void setAnalyzerName(final String newAnalyzerName) {
 		this.analyzerName = newAnalyzerName;
 	}
@@ -161,52 +142,39 @@ abstract public class LuceneCore
 	{
 		if(p.containsKey(LuSqlFields.BufferSizeKey))
 			setRAMBufferSize(Double.parseDouble(p.getProperty(LuSqlFields.BufferSizeKey).get(0)));
-		db("RAMBufferSize", Double.toString(getRAMBufferSize()));
+		
 
 		if(p.containsKey(LuSqlFields.CreateSinkKey))
 			setIndexCreate(Boolean.parseBoolean(p.getProperty(LuSqlFields.CreateSinkKey).get(0)));
-		db("Create Index:", Boolean.toString(isIndexCreate()));
+		
 
 		if(p.containsKey(LuSqlFields.SinkLocationKey))
 			setLuceneIndexName(p.getProperty(LuSqlFields.SinkLocationKey).get(0));
 	    
-		db("SinkLocation", getLuceneIndexName());
+		
 
 		if(p.containsKey(LuSqlFields.AnalyzerClassKey))
 			setAnalyzerName(p.getProperty(LuSqlFields.AnalyzerClassKey).get(0));
 	    
-		db("AnalyzerClass", getAnalyzerName()); 
+
 
 		if(p.containsKey(LuSqlFields.StopWordFileNameKey))
 			setStopWordFileName(p.getProperty(LuSqlFields.StopWordFileNameKey).get(0));
-		db("StopWordFile", getStopWordFileName());
+		
 
 		if(p.containsKey(LuSqlFields.QueryKey))
 			setQuery(p.getProperty(LuSqlFields.QueryKey).get(0));
-		db("Query", getQuery());
+		
 
 		if(p.containsKey(LuSqlFields.SourceLocationKey))
 			setSourceLocation(p.getProperty(LuSqlFields.SourceLocationKey).get(0));
-		db("SourceLocation", getSourceLocation());
+		
 
 
 		if(p.containsKey(LuSqlFields.AppendToSinkKey))
 			setAppendToSink(Boolean.parseBoolean(p.getProperty(LuSqlFields.AppendToSinkKey).get(0)));
-		db("RemoveSinksOnDone", "" + isRemoveOnDone());
+		
 
-	}
-
-
-	public void db(String w, String v)
-	{
-		/*
-		  if(debug)
-		  System.err.println(this.getClass().getName() 
-		  + ":"
-		  + w
-		  + ":"
-		  + v);
-		*/
 	}
 
 

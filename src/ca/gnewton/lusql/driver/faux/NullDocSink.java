@@ -8,6 +8,7 @@ import org.apache.lucene.document.*;
 import org.apache.lucene.store.*;
 import java.util.*;
 import java.util.concurrent.locks.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import ca.gnewton.lusql.util.*;
 import ca.gnewton.lusql.core.*;
@@ -54,11 +55,11 @@ public class NullDocSink
 	    return null;
 	}
 	
-	long count = 0l;
+	private volatile AtomicLong count = new AtomicLong(0);
 	public void addDoc(Doc[] docList)  
 	throws DocSinkException
 	{
-		count += (long)(docList.length);
+		count.getAndAdd((long)(docList.length));
 	}
 
     public void done()  

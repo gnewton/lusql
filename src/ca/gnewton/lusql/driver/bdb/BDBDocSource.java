@@ -125,7 +125,7 @@ public class BDBDocSource
     void extractProperties(MultiValueProp p)
 	{
 	    if(p.containsKey(LuSqlFields.SourceLocationKey))
-		setIndexDirName(p.getProperty(LuSqlFields.SourceLocationKey).get(0));
+		    setIndexDirName(p.getProperty(LuSqlFields.SourceLocationKey).get(0));
 	}
 
     /**
@@ -170,7 +170,7 @@ public class BDBDocSource
 	
     }
 
-	
+	@Override
 	public Doc get(String field, String key)
 		throws DataSourceException
 	{
@@ -179,7 +179,13 @@ public class BDBDocSource
 		}
 		return core.getDoc(key);
 	}
-	
+
+	@Override
+    public boolean containsKey(String key)
+	    throws DatabaseException
+	{
+	    return core.containsKey(key);
+	}	
 
 }//
 

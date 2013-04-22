@@ -1,21 +1,9 @@
 package ca.gnewton.lusql.core;
 
-/**
- * Describe class AbstractDocSink here.
- *
- *
- * Created: Fri May  1 23:48:22 2009
- *
- * @author <a href="mailto:gnewton4@">Glen Newton</a>
- * @version 1.0
- */
 abstract public class AbstractDocSink 
     implements DocSink
 {
 
-    /**
-     * Describe supportsWritingToStdout here.
-     */
     private boolean supportsWritingToStdout = false;
     boolean supportsCompression = false;
     
