@@ -80,6 +80,17 @@ public class BDBDocSink
 
 	public Properties explainProperties()
 	{
+
+
+
+
+
+
+
+
+
+
+
 		return null;
 	}
 
@@ -97,13 +108,16 @@ public class BDBDocSink
 				if(doc.isLast()){
 					break;
 				}
-			
+
+
 				BDBDocWrapper w = new BDBDocWrapper();
+				String key = doc.getFieldValues(getPrimaryKeyField()).get(0);
+				core.containsKey(key);
 				try
 					{
 						try
 							{
-								w.setId(doc.getFieldValues(getPrimaryKeyField()).get(0));
+								w.setId(key);
 							}
 						catch(Throwable t)
 							{
@@ -116,6 +130,12 @@ public class BDBDocSink
 						w.addDoc(doc);
 						//bda.pIdx.put(w);
 						core.put(w);
+						if(core.containsKey(key)){
+						    BDBDocWrapper tmp = core.get(key);
+						    core.put(w);
+
+						}
+						
 					}
 				catch(Throwable t)
 					{
