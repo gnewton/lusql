@@ -88,7 +88,7 @@ public class IntegerDocumentDocSource
 	}
 
     
-	long numDocs = 100000000;
+	long numDocs = 10000000000l;
 
 	@PluginParameter(description="Set num docs", optional=true)
 	public void setNumDocs(long n)
