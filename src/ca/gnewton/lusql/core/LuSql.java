@@ -419,10 +419,10 @@ public class LuSql
 		throws DataSourceException
 	{
 		Doc doc = null;
-		int count = 0;
-		int added = 0;
+		long count = 0;
+		long  added = 0;
 		boolean done = false;
-		int docCount = 0;
+		long docCount = 0;
 		int docChunksCount = 0;
 
 		Doc[] docs = new Doc[docPacketSize];
@@ -567,7 +567,7 @@ public class LuSql
 	long t0 = System.currentTimeMillis();
 
 
-	void feedbackOutput(final int count)
+	void feedbackOutput(final long count)
 	{
 	    
 		if(!verbose)
@@ -583,7 +583,10 @@ public class LuSql
 		
 		if(count%outputChunk == 0)
 			{
-				System.err.println(count + "    " + timeDelta() + "s"
+				System.err.println(count + "    " + timeDelta() + "s" 
+						   + "    maxDocs=" + maxDocs
+						   + "    " + (int)(((float)count / (float)maxDocs)*100.0) + "%"
+
 				                   /*+ "        ABSTIME:" 
 				                     + count
 				                     + ":" 
