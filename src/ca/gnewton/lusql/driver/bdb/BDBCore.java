@@ -56,6 +56,7 @@ public class BDBCore
 	    envConfig = new EnvironmentConfig();
 	    envConfig.setAllowCreate(allowCreate);
 	    envConfig.setReadOnly(readOnly);
+	    envConfig.setTransactional(false);
 	    envConfig.setConfigParam(EnvironmentConfig.LOG_FILE_MAX, Long.toString(logFileMax));
 
 	    // Check to see what this does;
