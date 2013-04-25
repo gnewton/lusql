@@ -6,9 +6,19 @@ import ca.gnewton.lusql.core.*;
 import ca.gnewton.lusql.util.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
+
+
 public class LongDocumentDocSource 
 	extends AbstractDocSource 
 {
+	private final static Logger log = Logger.getLogger(LongDocumentDocSource.class.getName()); 
+	static
+	{
+		BasicConfigurator.configure();
+	}
+	
 	public String description()
 	{
 		return "Test source that creates 100 documents with fields testField1 and testField2 with integer values 0-100, and 7*(0-100) respectively";
@@ -100,10 +110,4 @@ public class LongDocumentDocSource
 		return false;
 	}
 
-	public String showState(int n)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.showState(n));
-		return sb.toString();
-	}
 }

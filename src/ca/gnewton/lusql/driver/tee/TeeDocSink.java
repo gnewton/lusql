@@ -191,7 +191,7 @@ public class TeeDocSink
 		for(DocSink sink: sinks)
 			{
 				sb.append(ca.gnewton.lusql.util.Util.offset("Sub DocSinks:",n));
-				sb.append(sink.showState(n+1));
+				sink.showState();
 			}
 		return sb.toString();
 	}

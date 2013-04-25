@@ -1,12 +1,17 @@
 package ca.gnewton.lusql.core;
  
+
+import ca.gnewton.lusql.util.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.util.*;
 import org.apache.commons.cli.*;
-import org.apache.log4j.*;
-import ca.gnewton.lusql.util.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
+
+//import org.apache.log4j.*;
 
 /**
  * Describe class LuSqlMain here.
@@ -14,8 +19,8 @@ import ca.gnewton.lusql.util.*;
  *
  * Created: Mon Nov 26 16:30:11 2007
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
- * @copyright CISTI / National Research Council Canada
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a> CISTI Research 
+ * @copyright CISTI / National Research Council Canada, Glen Newton
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
  */
@@ -23,7 +28,7 @@ import ca.gnewton.lusql.util.*;
 public class LuSqlMain
     implements LuceneFields, LuSqlFields, LocalAnnotation
 {
-	//static Category cat = Category.getInstance(LuSql.class.getName());
+	private final static Logger log = Logger.getLogger(LuSqlMain.class.getName()); 
     static
     {
 	    BasicConfigurator.configure();
@@ -87,7 +92,7 @@ public class LuSqlMain
 							printOptions(lusql);			
 						lusql.run();
 						if(LuSql.isVerbose())
-							System.err.println("*********** Elapsed time: " + (System.currentTimeMillis() - t0)/1000 + " seconds\n");
+							log.info("Elapsed time: " + (System.currentTimeMillis() - t0)/1000 + " seconds\n");
 						if(infoOut != null)
 							infoOut.close();
 						break;
@@ -119,18 +124,18 @@ public class LuSqlMain
 
     static void printOptions(LuSql lusql)
 	{
-	    Util.msg("Using Source:\t" + lusql.getDocSourceClassName(), false);
-	    Util.msg("Using Sink:\t" + lusql.getDocSinkClassName(), false);
-	    Util.msg("Using sql:" + Util.delim(lusql.getQuery()),false);
+	    log.info("Using Source:\t" + lusql.getDocSourceClassName());
+	    log.info("Using Sink:\t" + lusql.getDocSinkClassName());
+	    log.info("Using sql:" + Util.delim(lusql.getQuery()));
 	    if(lusql.getAnalyzerName() == null)
 			{
 				lusql.setAnalyzerName(DefaultAnalyzerClassName);
-				Util.msg("Using default analyzer", false);		
+				log.info("Using default analyzer");		
 			}
-	    Util.msg("Using Analyzer:" + Util.delim(lusql.getAnalyzerName()),false);
-	    Util.msg("Using Stop Word FileName:" + Util.delim(lusql.getStopWordFileName()),false);
-	    Util.msg("Using Properties FileName:" + Util.delim(lusql.getPropertiesFileName()),false);
-	    Util.msg("Using Global field parameters: " + lusql.getGlobalFieldIndexParameter(), false);
+	    log.info("Using Analyzer:" + Util.delim(lusql.getAnalyzerName()));
+	    log.info("Using Stop Word FileName:" + Util.delim(lusql.getStopWordFileName()));
+	    log.info("Using Properties FileName:" + Util.delim(lusql.getPropertiesFileName()));
+	    log.info("Using Global field parameters: " + lusql.getGlobalFieldIndexParameter());
 	    Map<String, LuceneFieldParameters>  paras = lusql.getFieldIndexParameters();
 	    if(paras != null && LuSql.isVerbose())
 			{
@@ -138,7 +143,7 @@ public class LuSqlMain
 				while(it.hasNext())
 					{
 						String f = it.next();
-						System.err.println("Using Lucene paramaters for field: " + f
+						log.info("Using Lucene paramaters for field: " + f
 										   + "  " + paras.get(f));
 					}
 			}
@@ -147,56 +152,56 @@ public class LuSqlMain
 	    if(lusql.getDBDriverName() == null)
 			{
 				lusql.setDBDriverName(DefaultJDBCDriverClassName);
-				Util.msg("Using default JDBC Driver", false);		
+				log.info("Using default JDBC Driver");		
 			}
-	    Util.msg("Using DB driver name:" + Util.delim(lusql.getDBDriverName()),false);
-	    Util.msg("Using DB URL:" + Util.delim(lusql.getDBUrl()),false);
-	    Util.msg("Using DocSink destination (i.e. Lucene index):" + lusql.getSinkLocationName(), false);
-	    Util.msg("Using Lucene index RAMBUFFER MBs:" + lusql.getRAMBufferSizeMB(), false);
+	    log.info("Using DB driver name:" + Util.delim(lusql.getDBDriverName()));
+	    log.info("Using DB URL:" + Util.delim(lusql.getDBUrl()));
+	    log.info("Using DocSink destination (i.e. Lucene index):" + lusql.getSinkLocationName());
+	    log.info("Using Lucene index RAMBUFFER MBs:" + lusql.getRAMBufferSizeMB());
 
-	    Util.msg("Using multithreaded:" + lusql.isThreaded(), false);
+	    log.info("Using multithreaded:" + lusql.isThreaded());
 	    if(lusql.isThreaded())
 			{
-				Util.msg("\tUsing # threads:" + lusql.getNumThreads(), false);
-				Util.msg("\tUsing queue size:" + lusql.makeQueueSize(), false);
+				log.info("\tUsing # threads:" + lusql.getNumThreads());
+				log.info("\tUsing queue size:" + lusql.makeQueueSize());
 			}
-	    Util.msg("Using Test:" + lusql.isTest(), false);
+	    log.info("Using Test:" + lusql.isTest());
 	    /*
 		  if(lusql.getFieldIndexParameters() == null)
-		  Util.msg("Using Field parameters:" + formatFieldParameters(lusql), false);
+		  log.info("Using Field parameters:" + formatFieldParameters(lusql));
 
 		  else
-		  Util.msg("Using Field Index Parameters:" + Util.delim(lusql.getFieldIndexParameters()),false);		
+		  log.info("Using Field Index Parameters:" + Util.delim(lusql.getFieldIndexParameters()));		
 	    */
 	    if(lusql.isMySql())
-			Util.msg("Using setting DB fetchsize=0 (see -m)", false);
+			log.info("Using setting DB fetchsize=0 (see -m)");
 	    else
-			Util.msg("UsingDB is NOT MySql", false);
-	    Util.msg("Using Num documents to add:" + lusql.getMaxDocs(), false);
+			log.info("UsingDB is NOT MySql");
+	    log.info("Using Num documents to add:" + lusql.getMaxDocs());
 
-	    Util.msg("Using -Q SQL replacement character:" + SubQuery.getKeyMeta(), false);
+	    log.info("Using -Q SQL replacement character:" + SubQuery.getKeyMeta());
 	    Iterator<SubQuery>sqs = lusql.getSubQueries().iterator();
 	    while(sqs.hasNext())
-			Util.msg("Using -Q SQL:" + sqs.next().getQuery(), false);
+			log.info("Using -Q SQL:" + sqs.next().getQuery());
 
 	    
 
 	    // Filters
 	    List<String> filters = lusql.getDocFilterNames();
-	    Util.msg("Using filters:", false);
+	    log.info("Using filters:");
 	    if(filters == null || filters.size() == 0)
-			Util.msg("\tnone", false);
+			log.info("\tnone");
 	    else
 			{
 				for(String filterName: filters)
-					Util.msg("\t" + filterName, false);
+					log.info("\t" + filterName);
 				// Filter properties
 				Map<String, MultiValueProp> fp = lusql.getFilterProperties();
 				Iterator<String> it = fp.keySet().iterator();
 				while(it.hasNext())
 					{
 						String k = it.next();
-						System.err.println("\tFilter properties: " + k + "=" + fp.get(k));
+						log.info("Filter properties: " + k + "=" + fp.get(k));
 					}
 			}
 
@@ -204,8 +209,10 @@ public class LuSqlMain
 
 	    try
 			{
-				System.err.print(lusql.getDocSource().showState(0));
-				System.err.print(lusql.getDocSink().showState(0));
+				log.info("Source state: ");
+				lusql.getDocSource().showState();
+				log.info("Sink state: ");
+				lusql.getDocSink().showState();
 			}
 	    catch(Throwable t)
 			{
@@ -219,11 +226,11 @@ public class LuSqlMain
 	    Iterator<String>it = fieldMap.keySet().iterator();
 	    if(fieldMap.size()>0)
 			{
-				Util.msg("Using field mappings:", false);
+				log.info("Using field mappings:");
 				while(it.hasNext())
 					{
 						String key = it.next();
-						Util.msg("\tSource." + key + " => Sink." + fieldMap.get(key), false);
+						log.info("\tSource." + key + " => Sink." + fieldMap.get(key));
 					}
 			}
 
@@ -521,9 +528,6 @@ public class LuSqlMain
 								return RunState.ShowOptions;
 							}
 			
-						System.out.println("   -i=" + parts[0]
-										   + "==" + parts[1]);
-			
 						lusql.addFieldIndexParameter(parts[0], parts[1]);
 					}
 			}
@@ -536,7 +540,7 @@ public class LuSqlMain
 
 	    if(line.hasOption("P")){
 		    lusql.setPrimaryKeyField(line.getOptionValue("P"));
-		    System.out.println("----------- setting primary key field: " + lusql.getPrimaryKeyField());
+		    log.info("Setting primary key field: " + lusql.getPrimaryKeyField());
 		    
 	    }
 
@@ -957,12 +961,9 @@ public class LuSqlMain
 				if(plugin instanceof DocSink)
 					pluginType = "Sink";
 				Properties ex = plugin.explainProperties();
-				System.err.println(explain[i]);
-				System.err.println("Description: " + plugin.description());
-
-
-				System.err.println("Properties:");
-		
+				log.info(explain[i]);
+				log.info("Description: " + plugin.description());
+				
 				if(ex == null)
 					{
 						System.err.println("\tNo properties" );
@@ -972,7 +973,7 @@ public class LuSqlMain
 				while(it.hasNext())
 					{
 						String key = (String)it.next();
-						System.err.println("  " +  key + ": " + ex.get(key));
+						log.info("Property: " + key + ": " + ex.get(key));
 					}
 		
 			}
@@ -1021,13 +1022,7 @@ public class LuSqlMain
 		for(String arg: args){
 			sb.append(arg + " ");
 		}
-
-		System.err.println("\n\n\n\n\n");
-		
-		System.err.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-		System.err.println(sb);
-		System.err.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-		
+		log.info("Args: " + sb);
 	}
 	
 	static boolean argumentsPrinted = false;

@@ -312,7 +312,7 @@ public class BDBDocSink
 		throws PluginException    
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(ca.gnewton.lusql.util.Util.offset(super.showState(n), n));
+		super.showState();
 	
 		sb.append(ca.gnewton.lusql.util.Util.offset("read-only:" + readOnly,n+1));
 		sb.append(ca.gnewton.lusql.util.Util.offset("primary key field:" + primaryKeyField,n+1));

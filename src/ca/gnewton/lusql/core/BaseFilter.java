@@ -2,6 +2,8 @@ package ca.gnewton.lusql.core;
 import org.apache.lucene.document.*;
 import java.util.*;
 import ca.gnewton.lusql.util.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
 
 /**
  * Describe class BaseFilter here.
@@ -10,8 +12,8 @@ import ca.gnewton.lusql.util.*;
  * Created: Wed Jan 16 03:47:09 2008
  *
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
- * @copyright CISTI / National Research Council Canada
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a> CISTI Research 
+ * @copyright CISTI / National Research Council Canada, Glen Newton
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
  *
@@ -20,6 +22,12 @@ import ca.gnewton.lusql.util.*;
 abstract public class BaseFilter 
     implements DocFilter
 {
+	private final static Logger log = Logger.getLogger(LuSqlMain.class.getName()); 
+    static
+    {
+	    BasicConfigurator.configure();
+    }
+
     private LuSql luSql;
     MultiValueProp properties = null;
 
@@ -104,5 +112,19 @@ abstract public class BaseFilter
     {
 	this.threadSafe = newThreadSafe;
     }
+
+	private long maxDocs = Long.MAX_VALUE;
+	public void setMaxDocs(final long maxDocs)
+	{
+		this.maxDocs = maxDocs;
+	}
+
+	@Override
+	public void showState() throws PluginException
+	{
+	    Util.showState(this, log);
+
+	}
+
     
 }

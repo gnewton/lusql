@@ -9,7 +9,7 @@ import java.util.*;
  *
  * Created: Fri Sep 12 13:09:29 2008
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a> CISTI Research 
  * @copyright CISTI / National Research Council Canada
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt

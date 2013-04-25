@@ -8,7 +8,7 @@ import org.apache.lucene.document.*;
  * Created: Mon Nov 26 16:49:01 2007
  *
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a> CISTI Research 
  * @copyright CISTI / National Research Council Canada
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt

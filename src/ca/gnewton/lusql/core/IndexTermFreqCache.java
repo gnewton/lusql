@@ -16,7 +16,7 @@ import org.apache.lucene.store.*;
  * Copyright 2008 National Research Council
  * License: GNU Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txtk
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a>CISTI Research, National Research Council
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a>CISTI Research, National Research Council
  * @version 0.9
  */
 public class IndexTermFreqCache 

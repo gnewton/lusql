@@ -1,5 +1,8 @@
 package  ca.gnewton.lusql.core;
 import java.util.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
+
 
 /**
  * Describe class AbstractDocSource here.
@@ -13,6 +16,12 @@ import java.util.*;
 abstract public class AbstractDocSource 
 	implements DocSource
 {
+	private final static Logger log = Logger.getLogger(AbstractDocSource.class.getName()); 
+    static
+    {
+	    BasicConfigurator.configure();
+    }
+
 
 	private int chunkHint = 10;
 	private boolean threaded = false;
@@ -36,14 +45,12 @@ abstract public class AbstractDocSource
 		return supportsCompression;
 	}
 
-	public String showState(int n)
+	@Override
+	public void showState() throws PluginException
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(ca.gnewton.lusql.util.Util.offset("DocSource: " + this.getClass().getName(),n) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("supports compression: " + supportsCompression(),n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("thread safe: " + isThreadSafe(),n+1) + "\n");
-		sb.append(ca.gnewton.lusql.util.Util.offset("supports reading from stdin: " + isSupportsReadingFromStdin(), n+1) + "\n");
-		return sb.toString();
+	    Util.showState(this, log);
+
+	    log.info("Supports reading from stdin: " + isSupportsReadingFromStdin());
 	}
 
 

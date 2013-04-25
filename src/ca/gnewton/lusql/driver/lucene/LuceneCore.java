@@ -14,9 +14,17 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.store.*;
 import org.apache.lucene.util.Version;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
 
 public class LuceneCore 
 {
+	private final static Logger log = Logger.getLogger(LuceneCore.class.getName()); 
+    static
+    {
+	    BasicConfigurator.configure();
+    }
+
 	public static final String DEFAULT_ANALYZER="org.apache.lucene.analysis.standard.StandardAnalyzer";
 	
 	boolean debug = false;
@@ -295,4 +303,18 @@ public class LuceneCore
 	{
 		return appendToSink;
 	}
+
+	private long maxDocs = Long.MAX_VALUE;
+	public void setMaxDocs(final long maxDocs)
+	{
+		this.maxDocs = maxDocs;
+	}
+
+	//@Override
+    public void showState()
+		throws PluginException    
+    {
+	    //ca.gnewton.lusql.core.Util.showState(this, log);
+    }
+	
 }

@@ -40,9 +40,19 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.store.*;
 import org.apache.lucene.util.*;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
+
+
 public class LuSql
 	implements LuceneFields, LuSqlFields
 {
+	private final static Logger log = Logger.getLogger("lusql"); 
+    static
+    {
+	    BasicConfigurator.configure();
+    }
+
 	public static final double ThreadFactor = 1.5;
 	public static float loadAverageLimit = 7.0f;
 
@@ -57,6 +67,7 @@ public class LuSql
 		                                                         Field.Store.YES,
 		                                                         Field.TermVector.NO);
 	}
+
 
 	public static Version luceneVersion = Version.LUCENE_36;
 
@@ -346,8 +357,6 @@ public class LuSql
 				AddDocument.setSubQueryJoinFilters(subQueryJoinFilters);
 		
 				initThreadPoolExecutor();
-				if(verbose)
-					System.err.println(this.getClass().getName());
 
 				setDocSink(makeDocSink(getSinkProperties()));		
 				AddDocument.setDocSink(getDocSink());
@@ -435,7 +444,7 @@ public class LuSql
 					continue;
 		    
 				if(doc.isLast()){
-					System.out.println("LuSql: islast");
+					log.info("LuSql: islast");
 					break;
 				}
 				
@@ -456,7 +465,7 @@ public class LuSql
 					}
 			}
 		// flush out the last
-		System.out.println("LuSql: flushing out the remainder: " + n);
+		log.info("LuSql: flushing out the remainder: " + n);
 
 		Doc[] endDocs = new Doc[n];
 		for(int i=0; i<n; i++)
@@ -487,8 +496,8 @@ public class LuSql
 		addDoc(endDocs);
 		++docChunksCount;
 
-		System.out.println("LuSql: Total docs sent: " + docCount);
-		System.out.println("LuSql: Total chunks doc sent: " + docChunksCount);
+		log.info("Total docs sent: " + docCount);
+		log.info("Total chunks doc sent: " + docChunksCount);
 	}
      
 
@@ -583,7 +592,7 @@ public class LuSql
 		
 		if(count%outputChunk == 0)
 			{
-				System.err.println(count + "    " + timeDelta() + "s" 
+				log.info("Count=" + count + "    " + timeDelta() + "s" 
 						   + "    maxDocs=" + maxDocs
 						   + "    " + (int)(((float)count / (float)maxDocs)*100.0) + "%"
 
@@ -643,8 +652,8 @@ public class LuSql
 				try
 					{
 						df.init(filterProperties.get(""+n));
-						System.out.println("LuSql: filter properties:" 
-						                   + filterProperties.get(""+n));
+						log.info("Filter properties:" 
+						         + filterProperties.get(""+n));
 					}
 				catch(Throwable t)
 					{
@@ -806,7 +815,7 @@ public class LuSql
 				{
 					p.setProperty(SecondarySinkLocationKey + i, 
 					              secondaryIndexNames.get(i));
-					System.out.println("---- > SecondaryIndex: " 
+					log.info("SecondaryIndex: " 
 					                   + SecondarySinkLocationKey + i
 					                   + ":" 
 					                   +secondaryIndexNames.get(i)
@@ -1018,8 +1027,7 @@ public class LuSql
 
 		  System.out.println(sb);
 		*/
-	    
-		System.out.println(rs.getString(1));
+		log.info("ResultSet string:  " + rs.getString(1));
 	}
 
 	/**
@@ -1284,7 +1292,7 @@ public class LuSql
 		// FIXX??
 		if(!(docSource instanceof ca.gnewton.lusql.driver.jdbc.JDBCDocSource))
 			{
-				System.err.println("Error: DocSource is not JDBC; unable to have subqueries");
+				log.error("DocSource is not JDBC; unable to have subqueries");
 				return;
 			}
 
@@ -1408,8 +1416,8 @@ public class LuSql
 		//System.out.print(",");
 		if((recordCount)%outputChunk== 0 && recordCount > 1)
 			{
-				System.out.println(" " + recordCount + " docs    " + (System.currentTimeMillis()-t0)/1000 + "s");
-				System.out.println(outputChunk);
+				log.info(recordCount + " docs    " + (System.currentTimeMillis()-t0)/1000 + "s");
+				log.info("outputchunk: " + outputChunk);
 				
 				t0 = System.currentTimeMillis();
 			}
@@ -1548,9 +1556,9 @@ public class LuSql
 			}
 		docSource.setMaxDocs(maxDocs);
 		
-		System.out.println("LuSql: init docSource");
+		log.info("init docSource");
 		docSource.init(makeDocSourceProperties());
-		System.out.println("LuSql: init docSource DONE");
+		log.info("init docSource DONE");
 	}
 
 	MultiValueProp makeDocSourceProperties()

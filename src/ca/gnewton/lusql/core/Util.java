@@ -2,6 +2,7 @@ package ca.gnewton.lusql.core;
 import org.apache.lucene.document.*;
 import java.util.*;
 import java.io.*;
+import org.apache.log4j.Logger;
 /**
  * Describe class Util here.
  *
@@ -9,7 +10,7 @@ import java.io.*;
  * Created: Mon Jul 21 13:53:12 2008
  *
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a> CISTI Research 
  * @copyright CISTI / National Research Council Canada
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
@@ -123,4 +124,13 @@ public class Util
     static public final void setOut(final BufferedWriter newOut) {
 	out = newOut;
     }
+
+	public final static void showState(Plugin p, Logger log)
+	{
+		log.info("State class: " + p.getClass().getName());
+		log.info("Is threaded: " + p.isThreaded());
+		log.info("Is thread safe: " + p.isThreadSafe());
+
+	}
+	
 }

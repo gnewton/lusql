@@ -12,7 +12,7 @@ import org.apache.lucene.store.*;
  * Created: Sat Jan 19 10:17:33 2008
  *
  *
- * @author <a href="mailto:glen.newton@nrc-cnrc.gc.ca">Glen Newton</a> CISTI Research 
+ * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a> CISTI Research 
  * @copyright CISTI / National Research Council Canada
  * @version 0.9
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt

@@ -8,7 +8,7 @@ import ca.gnewton.lusql.util.LoadAvg;
 
 /**
  * @author <a href="mailto:glen.newton@gmail.com">Glen Newton</a>
- * @copyright CISTI / National Research Council Canada & Glen Newton
+ * @copyright CISTI / National Research Council Canada, , Glen Newton & Glen Newton
  * License: Apache v2 http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  */

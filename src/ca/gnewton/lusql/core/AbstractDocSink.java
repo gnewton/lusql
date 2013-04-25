@@ -1,8 +1,15 @@
 package ca.gnewton.lusql.core;
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
 
 abstract public class AbstractDocSink 
     implements DocSink
 {
+	private final static Logger log = Logger.getLogger(AbstractDocSink.class.getName()); 
+	static
+	{
+		BasicConfigurator.configure();
+	}
 
     private boolean supportsWritingToStdout = false;
     boolean supportsCompression = false;
@@ -77,17 +84,16 @@ abstract public class AbstractDocSink
 	return writingToStdout;
     }
 
-    public String showState(int n)
-	throws PluginException    
+	@Override
+    public void showState()
+		throws PluginException    
     {
-	StringBuilder sb = new StringBuilder();
-	sb.append(ca.gnewton.lusql.util.Util.offset("DocSink: " + this.getClass().getName(),n) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("is threaded: " + isThreaded(),n+1) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("remove on done: " + isRemoveOnDone(), n+1) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("supports compression: " + isSupportsCompression(), n+1) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("supports writing to stdout: " + isSupportsWritingToStdout(), n+1) + "\n");
-	sb.append(ca.gnewton.lusql.util.Util.offset("requires primary key field: " + requiresPrimaryKeyField(), n+1) + "\n");
-	return sb.toString();
+	    Util.showState(this, log);
+	    
+		log.info("Remove on done: " + isRemoveOnDone());	
+	    log.info("Supports compression: " + isSupportsCompression());
+	    log.info("Supports writing to stdout: " + isSupportsWritingToStdout());
+	    log.info("Requires primary key field: " + requiresPrimaryKeyField());
     }
 
 	protected String primaryKeyField = null;

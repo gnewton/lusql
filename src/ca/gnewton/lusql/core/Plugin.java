@@ -1,6 +1,8 @@
 package ca.gnewton.lusql.core;
 import java.util.*;
 import ca.gnewton.lusql.util.*;
+import org.apache.log4j.Logger;
+
 /**
  Plugin is a dynamically (run-time) loaded module.
 
@@ -46,7 +48,9 @@ public interface Plugin
     */
     public void done() throws PluginException;
 
-    public String showState(int level) throws PluginException;
+	public void showState() throws PluginException;
+	
+	
 
     // A hint for possible thread issues
     public boolean isThreaded();

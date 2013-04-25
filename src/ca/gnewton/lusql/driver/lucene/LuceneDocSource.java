@@ -280,13 +280,6 @@ public class LuceneDocSource
 		return readingFromStdin;
 	}
 
-	public String showState(int n)
-		throws PluginException    
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(ca.gnewton.lusql.util.Util.offset("DocSink: " + this.getClass().getName(),n));
-		return sb.toString();
-	}
 
 	boolean threadSafe = false;
     

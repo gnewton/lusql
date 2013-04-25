@@ -18,7 +18,7 @@ export HEAP_SMALL=" -Xmx${SMALLMAXHEAPSIZE}m    "
 export VMARGS=" ${HEAP} -XX:+AggressiveOpts "
 export VMARGS_SMALL=" ${HEAP_SMALL} -XX:+AggressiveOpts "
 
-export n="10000000000"
+export n="100"
 
 export dirTime=`date +%Y.%m.%d.%k_%M_%S.%N`
 
