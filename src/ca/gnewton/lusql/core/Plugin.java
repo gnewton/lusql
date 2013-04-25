@@ -57,4 +57,7 @@ public interface Plugin
     // Does LuSql have to wrap its calls to this plugin in a Lock?
     public boolean isThreadSafe();    
     public void setThreadSafe(boolean b);    
+
+
+	public void setMaxDocs(long l);
 }

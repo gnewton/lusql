@@ -80,17 +80,6 @@ public class BDBDocSink
 
 	public Properties explainProperties()
 	{
-
-
-
-
-
-
-
-
-
-
-
 		return null;
 	}
 
@@ -130,11 +119,12 @@ public class BDBDocSink
 						w.addDoc(doc);
 						//bda.pIdx.put(w);
 						core.put(w);
+						/*
 						if(core.containsKey(key)){
 						    BDBDocWrapper tmp = core.get(key);
 						    core.put(w);
-
-						}
+						    }
+						*/
 						
 					}
 				catch(Throwable t)

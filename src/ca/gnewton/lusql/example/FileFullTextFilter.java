@@ -692,7 +692,7 @@ public class FileFullTextFilter
     public String showState(int n)
     {
 	StringBuilder sb = new StringBuilder();
-	sb.append(ca.gnewton.lusql.util.Util.offset("Filter: IntegerDocumentDocSource",n));
+	sb.append(ca.gnewton.lusql.util.Util.offset("Filter: LongDocumentDocSource",n));
 	sb.append(ca.gnewton.lusql.util.Util.offset("maxTextNumChars:" + maxTextNumChars, n+1));
 	sb.append(ca.gnewton.lusql.util.Util.offset("minTextNumChars:" + minTextNumChars, n+1));
 	sb.append(ca.gnewton.lusql.util.Util.offset("sinkField:" + sinkField, n+1));

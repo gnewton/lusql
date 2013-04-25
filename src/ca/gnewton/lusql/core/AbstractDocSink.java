@@ -126,6 +126,14 @@ abstract public class AbstractDocSink
 		throw new NullPointerException("Class does not override description()");
 	}
 	
+	private long maxDocs = Long.MAX_VALUE;
+	public void setMaxDocs(final long maxDocs)
+	{
+		this.maxDocs = maxDocs;
+	}
+
+
+
 	
 	
     

@@ -26,4 +26,7 @@ public interface DocSink
     public void setRemoveOnDone(boolean b);
     public void setPrimaryKeyField(String f);
     public boolean requiresPrimaryKeyField();
+
+
+	
 }

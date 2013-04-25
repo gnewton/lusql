@@ -11,7 +11,6 @@ public @interface PluginParameter
 	boolean optional() default true;
 	boolean isList() default false;
 	// if isList, then 
-
 	
 	public class Validator
 	{

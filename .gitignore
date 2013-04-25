@@ -5,4 +5,4 @@ tags
 unjar
 build
 dist
-testDir
+test/scripts/testDir*

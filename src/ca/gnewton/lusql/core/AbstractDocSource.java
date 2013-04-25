@@ -98,6 +98,11 @@ abstract public class AbstractDocSource
 	{
 		
 	}
-	
+
+	private long maxDocs = Long.MAX_VALUE;
+	public void setMaxDocs(final long maxDocs)
+	{
+		this.maxDocs = maxDocs;
+	}
 	
 }

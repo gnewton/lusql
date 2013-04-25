@@ -761,7 +761,7 @@ public class LuSql
 		Map<String, MultiValueProp> allPluginProps = new HashMap<String, MultiValueProp> ();
 		MultiValueProp mvp = new MultiValueProp();
 		mvp.put("numDocs", "100");
-		allPluginProps.put("ca.gnewton.lusql.driver.faux.IntegerDocumentDocSource",
+		allPluginProps.put("ca.gnewton.lusql.driver.faux.LongDocumentDocSource",
 		                   mvp);
 
 		Class<? extends DocSource> docSourceClass = source.getClass();
@@ -788,6 +788,8 @@ public class LuSql
 	{
 
 		DocSink docSink = makeDocSink(getDocSinkClassName(), this.isSinkWriteToStdout());
+
+		docSink.setMaxDocs(maxDocs);
 
 		// FIXXX
 		p.setProperty(AnalyzerClassKey, getAnalyzerName());
@@ -1544,6 +1546,8 @@ public class LuSql
 				for(String f:fieldNames)
 					docSource.addField(f);
 			}
+		docSource.setMaxDocs(maxDocs);
+		
 		System.out.println("LuSql: init docSource");
 		docSource.init(makeDocSourceProperties());
 		System.out.println("LuSql: init docSource DONE");
