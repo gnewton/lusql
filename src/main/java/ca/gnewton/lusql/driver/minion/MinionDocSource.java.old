@@ -1,0 +1,177 @@
+package ca.nrc.cisti.lusql.drivers.lucene;
+import java.io.*;
+import org.apache.lucene.index.*;
+import org.apache.lucene.analysis.Analyzer;
+import java.lang.reflect.Constructor;
+import org.apache.lucene.document.*;
+import org.apache.lucene.store.*;
+import java.util.*;
+import org.apache.lucene.store.Directory.*;
+import java.util.concurrent.locks.*;
+import ca.nrc.cisti.lusql.core.*;
+
+
+
+/**
+ * Describe class LuceneDocSource here.
+ *
+ *
+ * Created: Mon Dec 22 13:59:00 2008
+ *
+ * @author <a href="mailto:gnewton@">Glen Newton</a>
+ * @version 1.0
+ */
+public class LuceneDocSource 
+    extends LuceneCore
+    implements DocSource
+{
+	{
+	    debug = true;
+	}
+    boolean search = false;
+    /**
+     * Creates a new <code>LuceneDocSource</code> instance.
+     *
+     */
+    public LuceneDocSource() {
+
+    }
+
+    static
+	{
+	    System.setProperty("org.apache.lucene.FSDirectory.class",NIOFSDirectory.class.getName());
+	}
+
+    IndexReader reader = null;
+    FieldSelector fieldSelector = null;
+    public void init(Properties p) throws PluginException
+	{
+	    try
+	    {
+		extractProperties(p);
+		if(getQuery() != null || getQuery().equals("*"))
+		    search = true;
+		reader = IndexReader.open(NIOFSDirectory.getDirectory(getSourceLocation()), 
+					  true);
+		if(fields != null)
+		{
+
+		    String[] wantedFields = new String[fields.size()];
+		    Iterator<String>it = fields.iterator();
+		    int n = 0;
+		    while(it.hasNext())
+		    {
+			wantedFields[n++] = it.next();
+		    }
+		    fieldSelector = new MapFieldSelector(wantedFields);
+		}
+		if(search)
+		{
+		    // TODO doSearch();
+		}
+	    }
+	    catch(Throwable t)
+	    {
+		printDefaults();
+		t.printStackTrace();
+		throw new PluginException();
+	    }
+	}	    
+
+
+    public Map<String, String> explainProperties()
+	{
+	    return null;
+	}
+
+    public void done() throws PluginException
+	{
+	    try
+	    {
+		reader.close();
+	    }
+	    catch(Throwable t)
+	    {
+		throw new PluginException("LucenDocSource: Problem closing lucene index: " 
+					  + getSourceLocation());
+	    }
+	}
+
+
+    public Doc next()  throws DataSourceException
+	{
+	    try
+	    {
+		if(search)
+		{
+		    // TODOreturn nextSearchResult();
+		}
+		else
+		    return nextDoc();
+		
+		return nextDoc();
+	    }
+	    catch(Throwable t)
+	    {
+		t.printStackTrace();
+		throw new DataSourceException();
+	    }
+
+	}
+    
+    void extractProperties(Properties p)
+	{
+	    luceneExtractProperties(p);
+	}
+
+
+    private final ReentrantLock lock = new ReentrantLock();
+    int n = 0;
+    Doc nextDoc()
+	throws CorruptIndexException, IOException
+	{
+
+	    lock.lock();
+	    Document document = null;
+	    try
+	    {
+		System.out.println("------ " + n + " of " 
+				   + reader.numDocs());
+		if(n<reader.numDocs())
+		    document = reader.document(n, fieldSelector);
+		else 
+		    return null;
+		n++;
+	    }
+	    finally
+	    {
+		lock.unlock();
+	    }
+	    return makeDoc(document);
+	}
+
+    Doc makeDoc(Document d)
+	{
+	    Doc doc = new DocImp();
+	    Iterator<Field>it = d.getFields().iterator();
+	    while(it.hasNext())
+	    {
+		Field field = it.next();
+		String sName = field.name();
+		if(fields != null && !fields.contains(sName))
+		    continue;
+		String[] values = d.getValues(sName);
+		for(int i=0; i<values.length; i++)
+		    doc.addField(sName, values[i]);
+	    }
+	    return doc;
+	}
+
+    Set<String>fields = null;
+    public void addField(final String field)
+	{
+	    if(fields == null)
+		fields = new HashSet<String>();
+	    fields.add(field);
+	}
+}

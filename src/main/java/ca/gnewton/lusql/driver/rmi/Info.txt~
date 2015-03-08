@@ -1,0 +1,11 @@
+RMIDocSink
+RMIDocSource (ROund robins to a # of RMI LuSqls)
+
+In Theory, has one instance: JDBCDocSource/RMIDocSink
+and has n-instances of: RMIDocSink/LuceneDocSink
+
+
+
+
+
+
